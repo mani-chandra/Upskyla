@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ModuleLayout } from "@/components/layout/ModuleLayout";
 import { 
   BookOpen, 
@@ -66,10 +67,12 @@ export default function CoursesPage() {
         {/* Featured Course/Last Watched */}
         <div className="bg-gray-900 rounded-2xl overflow-hidden text-white shadow-xl flex flex-col md:flex-row">
           <div className="md:w-1/2 relative h-64 md:h-auto">
-            <img 
+            <Image 
               src={courses[0].image} 
               alt="Course Thumbnail" 
-              className="absolute inset-0 w-full h-full object-cover opacity-60"
+              fill
+              className="object-cover opacity-60"
+              unoptimized
             />
             <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent" />
           </div>
@@ -100,10 +103,12 @@ export default function CoursesPage() {
           {courses.map((course) => (
             <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group cursor-pointer">
               <div className="relative h-48 overflow-hidden">
-                <img 
+                <Image 
                   src={course.image} 
                   alt={course.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  unoptimized
                 />
                 {course.progress === 100 && (
                   <div className="absolute top-4 right-4 bg-green-500 text-white p-1.5 rounded-full shadow-lg">

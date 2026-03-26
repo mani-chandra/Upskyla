@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const secretKey = process.env.JWT_SECRET;
-if (!secretKey && process.env.NODE_ENV === "production") {
+if (!secretKey && process.env.NODE_ENV === "production" && !process.env.NEXT_PHASE) {
+  // Only throw if we are in production AND NOT in the build phase (NEXT_PHASE is set during build)
+  // This allows the build to complete even if secrets aren't in the build env
   throw new Error("JWT_SECRET is not set in production environment");
 }
 const key = new TextEncoder().encode(secretKey || "development_secret_key");

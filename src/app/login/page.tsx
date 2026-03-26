@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Lock, Mail, ArrowRight, GraduationCap, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -109,8 +110,14 @@ export default function LoginPage() {
           >
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-primary-600 bg-primary-400 overflow-hidden">
-                  <img src={`https://i.pravatar.cc/150?u=${i}`} alt="user" />
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-primary-600 bg-primary-400 overflow-hidden relative">
+                  <Image 
+                    src={`https://i.pravatar.cc/150?u=${i}`} 
+                    alt="user" 
+                    fill
+                    sizes="32px"
+                    unoptimized
+                  />
                 </div>
               ))}
             </div>

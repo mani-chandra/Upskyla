@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const session = await getSession();
@@ -9,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const referrals = await prisma.referral.findMany({
+    const referrals = await (prisma as any).referral.findMany({
       include: {
         referrer: { select: { name: true, email: true } },
         referredUser: { select: { name: true, email: true } },
@@ -19,9 +21,9 @@ export async function GET() {
 
     const stats = {
       total: referrals.length,
-      registered: referrals.filter(r => r.status === "REGISTERED").length,
-      advancePaid: referrals.filter(r => r.status === "ADVANCE_PAID").length,
-      rewarded: referrals.filter(r => r.status === "REWARD_CREDITED").length,
+      registered: referrals.filter((r: any) => r.status === "REGISTERED").length,
+      advancePaid: referrals.filter((r: any) => r.status === "ADVANCE_PAID").length,
+      rewarded: referrals.filter((r: any) => r.status === "REWARD_CREDITED").length,
     };
 
     return NextResponse.json({ referrals, stats });
