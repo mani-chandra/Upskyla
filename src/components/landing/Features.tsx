@@ -2,7 +2,7 @@
 
 import { GraduationCap, Hotel, Car, BookOpen, Briefcase, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 const sections = [
   {
@@ -74,7 +74,7 @@ const sections = [
   },
 ];
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { y: 50, opacity: 0 },
   visible: (i: number) => ({
     y: 0,
@@ -82,7 +82,7 @@ const cardVariants = {
     transition: {
       delay: i * 0.1,
       duration: 0.5,
-      ease: "easeOut"
+      ease: "easeOut" as const
     }
   })
 };

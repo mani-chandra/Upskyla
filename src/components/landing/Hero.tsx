@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { ArrowRight, GraduationCap, Hotel, Car, BookOpen } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -14,23 +14,23 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.5, ease: "easeOut" }
+    transition: { duration: 0.5, ease: "easeOut" as const }
   }
 };
 
-const floatVariants = {
+const floatVariants: Variants = {
   initial: { y: 0 },
   animate: {
     y: [0, -10, 0],
     transition: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   }
 };
@@ -89,7 +89,7 @@ export function Hero() {
                   scale: [1, 1.02, 1],
                   rotate: [0, 1, 0]
                 }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" as const }}
               />
               <div className="grid grid-cols-2 gap-4">
                 <motion.div 
@@ -109,7 +109,7 @@ export function Hero() {
                   className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
                   initial={{ y: 0 }}
                   animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
                   whileHover={{ scale: 1.05 }}
                 >
                   <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-indigo-600 bg-indigo-50 rounded-xl">
@@ -122,7 +122,7 @@ export function Hero() {
                   className="p-6 bg-white rounded-2xl shadow-lg transform translate-y-8 border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
                   initial={{ y: 0 }}
                   animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" as const, delay: 0.5 }}
                   whileHover={{ scale: 1.05 }}
                 >
                   <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-orange-600 bg-orange-50 rounded-xl">
@@ -135,7 +135,7 @@ export function Hero() {
                   className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
                   initial={{ y: 0 }}
                   animate={{ y: [0, 12, 0] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" as const, delay: 1 }}
                   whileHover={{ scale: 1.05 }}
                 >
                   <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-green-600 bg-green-50 rounded-xl">

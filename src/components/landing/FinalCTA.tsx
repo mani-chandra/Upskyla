@@ -11,12 +11,12 @@ export function FinalCTA() {
       <motion.div 
         className="absolute -top-24 -left-24 w-64 h-64 bg-primary-500 rounded-full opacity-50"
         animate={{ scale: [1, 1.2, 1], x: [0, 20, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" as const }}
       />
       <motion.div 
         className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary-700 rounded-full opacity-50"
         animate={{ scale: [1, 1.1, 1], x: [0, -30, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" as const }}
       />
 
       <div className="container px-4 mx-auto relative z-10">
