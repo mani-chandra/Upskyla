@@ -8,11 +8,12 @@ export function Footer() {
       <div className="container px-4 mx-auto">
         <div className="flex flex-wrap -mx-4 mb-16">
           <div className="w-full lg:w-1/2 px-4 mb-12 lg:mb-0">
-            <Link href="/" className="inline-block mb-6 text-2xl font-bold font-heading text-primary-400">
-              StudentEcosystem
+            <Link href="/" className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic">U</div>
+              <span className="text-2xl font-bold font-heading text-primary-400 tracking-tight">Upskyla</span>
             </Link>
             <p className="max-w-xs text-gray-400 leading-relaxed">
-              Empowering the student community with a unified platform for every academic and personal need.
+              Empowering students beyond education with a unified ecosystem for living, learning, and growing.
             </p>
           </div>
           <div className="w-full lg:w-1/2 px-4">
@@ -48,7 +49,7 @@ export function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          &copy; {currentYear} StudentEcosystem Platform. All rights reserved.
+          &copy; {currentYear} Upskyla Platform. All rights reserved.
         </div>
       </div>
     </footer>

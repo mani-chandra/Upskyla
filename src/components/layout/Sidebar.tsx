@@ -52,9 +52,12 @@ export function Sidebar() {
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64 z-20">
       <div className="p-6">
-        <h1 className="text-xl font-bold text-primary-600">
-          StudentEcosystem
-        </h1>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic shrink-0">U</div>
+          <h1 className="text-xl font-bold text-primary-600 tracking-tight">
+            Upskyla
+          </h1>
+        </div>
       </div>
       
       <nav className="flex-1 px-4 space-y-1">

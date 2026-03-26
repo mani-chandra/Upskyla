@@ -7,7 +7,7 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Upskyla | Student Ecosystem Platform",
+  title: "Upskyla | Empowering Students Beyond Education",
   description: "A comprehensive modular SaaS for students",
 };
 

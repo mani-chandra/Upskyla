@@ -144,8 +144,9 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
         >
           <div className="text-center lg:text-left mb-10">
-            <Link href="/" className="lg:hidden inline-block mb-8 text-2xl font-bold text-primary-600">
-              StudentEcosystem
+            <Link href="/" className="lg:hidden inline-flex items-center gap-2 mb-8">
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic">U</div>
+              <span className="text-2xl font-bold text-gray-900 tracking-tight">Upskyla</span>
             </Link>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in</h2>
             <p className="text-gray-500">

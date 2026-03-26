@@ -7,14 +7,14 @@ import { Footer } from "@/components/landing/Footer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "StudentEcosystem | Empowering Students Beyond Education",
+  title: "Upskyla | Empowering Students Beyond Education",
   description: "A unified ecosystem for admissions, student living, mobility, career growth, and skill development — all in one platform.",
   openGraph: {
-    title: "StudentEcosystem | Empowering Students Beyond Education",
+    title: "Upskyla | Empowering Students Beyond Education",
     description: "A unified ecosystem for admissions, student living, mobility, career growth, and skill development.",
     type: "website",
-    url: "https://studentecosystem.com",
-    siteName: "StudentEcosystem",
+    url: "https://upskyla.com",
+    siteName: "Upskyla",
   },
 };
 
@@ -30,8 +30,8 @@ export default async function LandingPage() {
       {/* Navigation - Simple Sticky Header */}
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold">S</div>
-          <span className="text-xl font-bold text-gray-900">StudentEcosystem</span>
+          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic">U</div>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">Upskyla</span>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-4 py-2">

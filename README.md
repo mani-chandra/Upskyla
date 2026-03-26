@@ -1,66 +1,29 @@
-# Student Ecosystem Platform
+# Upskyla Platform
 
-A comprehensive, modular, role-based SaaS-style web platform for students, supporting education consultancy, hostel management, course LMS, taxi booking, and career portals.
+A comprehensive, modular student ecosystem platform designed to manage hostel living, academic consultancy, courses, mobility, and career growth.
 
-## 🚀 Features
+## Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Prisma ORM with Neon.tech (PostgreSQL)
+- **Auth**: Manual JWT with `jose` and `bcryptjs`
+- **Styling**: Tailwind CSS & Framer Motion
+- **Payments**: Razorpay Integration
 
-- **Education Consultancy**: Book consultations, take mock exams (IELTS, GRE), and track application status.
-- **Hostel Management**: View room details, pay fees, and raise maintenance tickets.
-- **Course LMS**: Purchase and watch video lessons, track progress, and earn certificates.
-- **Taxi & Vehicle Rental**: Book airport pickups, hourly rentals, or daily vehicle services.
-- **Career / Job Portal**: Browse job openings, upload resumes, and track applications.
-- **Central Admin Panel**: Manage users, feature flags, payments, and global settings.
-- **Feature Flag System**: Enable/disable modules dynamically for all students.
-- **Razorpay Integration**: Integrated payment gateway (test mode enabled).
-- **JWT Authentication**: Secure login with Role-Based Access Control (RBAC).
+## Core Modules
+- **Hostel**: Premium student accommodation management.
+- **Consultancy**: Academic and admission guidance.
+- **LMS**: Course management and enrollment.
+- **Mobility**: Taxi and vehicle rental services.
+- **Career**: Job portal and application tracking.
+- **Wallet**: Integrated referral and rewards system.
 
-## 🛠 Tech Stack
-
-- **Frontend**: Next.js (App Router), TypeScript, Tailwind CSS, Lucide React
-- **Backend**: Next.js API Routes, JWT, Bcrypt
-- **Database**: PostgreSQL with Prisma ORM
-- **Payments**: Razorpay Node SDK
-
-## 📦 Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- PostgreSQL database
-
-### Installation
-
-1. Clone the repository and navigate to the project directory:
-   ```bash
-   cd student-ecosystem-platform
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up environment variables:
-   Copy `.env.example` to `.env` and fill in your details:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Database Setup (Prisma):
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-
-5. Seed initial data:
-   ```bash
-   npx prisma db seed
-   ```
-
-6. Start the development server:
-   ```bash
-   npm run dev
-   ```
+## Setup
+1. Clone the repository.
+2. Install dependencies: `npm install`
+3. Set up environment variables in `.env`.
+4. Push schema: `npx prisma db push`
+5. Seed data: `npx prisma db seed`
+6. Run development server: `npm run dev`
 
 ### Default Accounts (After Seeding)
 
