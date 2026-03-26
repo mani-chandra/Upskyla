@@ -236,14 +236,14 @@ function HostelContent() {
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Location</p>
                     <p className="text-sm text-gray-700 font-medium flex items-center">
                       <MapPin className="w-4 h-4 mr-2 text-primary-500" />
-                      Academic Square, North Campus
+                      Mangalpally, Ibrahimpatnam
                     </p>
                   </div>
                   <div className="space-y-2">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Capacity</p>
                     <p className="text-sm text-gray-700 font-medium flex items-center">
                       <Users className="w-4 h-4 mr-2 text-primary-500" />
-                      200+ Students
+                      250+ Students
                     </p>
                   </div>
                   <div className="space-y-2">
