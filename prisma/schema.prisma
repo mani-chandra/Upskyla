@@ -55,6 +55,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Password Reset Fields
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
   // Referral Fields
   referralCode  String    @unique @default(cuid())
   referredByCode String?

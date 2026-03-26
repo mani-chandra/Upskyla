@@ -192,7 +192,7 @@ export default function LoginPage() {
                   <label className="text-sm font-semibold text-gray-700">
                     Password
                   </label>
-                  <Link href="#" className="text-xs font-semibold text-primary-600 hover:underline">
+                  <Link href="/forgot-password" title="Click to reset your password" className="text-xs font-semibold text-primary-600 hover:underline">
                     Forgot?
                   </Link>
                 </div>
