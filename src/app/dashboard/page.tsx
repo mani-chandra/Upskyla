@@ -105,7 +105,7 @@ export default function DashboardPage() {
       >
         <motion.div variants={itemVariants}>
           <h1 className="text-2xl font-bold text-gray-900">Welcome back!</h1>
-          <p className="text-gray-500">Here's what's happening with your student account today.</p>
+          <p className="text-gray-500">Here&apos;s what&apos;s happening with your student account today.</p>
         </motion.div>
 
         {/* Announcements Section */}
