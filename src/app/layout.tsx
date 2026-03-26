@@ -6,7 +6,7 @@ import { DashboardProvider } from "@/lib/context/DashboardContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Student Ecosystem Platform",
+  title: "Upskyla | Student Ecosystem Platform",
   description: "A comprehensive modular SaaS for students",
 };
 
