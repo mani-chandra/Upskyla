@@ -35,6 +35,7 @@ export default function AdminDashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [allotmentData, setAllotmentData] = useState({ block: "A", room: "1", bed: "1" });
+  const [allotting, setAllotting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -112,6 +113,7 @@ export default function AdminDashboardPage() {
 
   const updateHostelStatus = async (bookingId: string, field: string | null, value: any, roomNumber?: string) => {
     try {
+      if (roomNumber) setAllotting(true);
       const body: any = { bookingId };
       if (field) {
         body.field = field;
@@ -126,22 +128,33 @@ export default function AdminDashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+
+      const data = await res.json();
+
       if (res.ok) {
-        const updated = await res.json();
-        setHostelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updated.booking } : b));
+        setHostelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...data.booking } : b));
         setSelectedBooking(null);
         // Refresh referrals if status triggers reward
         if (field === "isCheckedIn" || field === "firstRentPaid" || roomNumber) {
           fetch("/api/admin/referrals").then(res => res.json()).then(data => setReferrals(data.referrals || []));
         }
+      } else {
+        alert(data.message || "Failed to update status");
       }
     } catch (error) {
       console.error("Error updating hostel status:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setAllotting(false);
     }
   };
 
   const handleAllotRoom = () => {
     if (!selectedBooking) return;
+    if (!allotmentData.room || parseInt(allotmentData.room) < 1 || parseInt(allotmentData.room) > 33) {
+      alert("Please enter a valid room number (1-33)");
+      return;
+    }
     const roomStr = `${allotmentData.block}-${allotmentData.room} (Bed ${allotmentData.bed})`;
     updateHostelStatus(selectedBooking.id, null, null, roomStr);
   };
@@ -220,9 +233,10 @@ export default function AdminDashboardPage() {
               <div className="flex gap-4 pt-2">
                 <button 
                   onClick={handleAllotRoom}
-                  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all active:scale-95"
+                  disabled={allotting}
+                  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center"
                 >
-                  Confirm Allotment
+                  {allotting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm Allotment"}
                 </button>
                 <button 
                   onClick={() => setSelectedBooking(null)}
