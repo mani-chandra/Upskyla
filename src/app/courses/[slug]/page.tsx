@@ -25,11 +25,14 @@ import Link from "next/link";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { ReceiptModal } from "@/components/layout/ReceiptModal";
 
 export default function CourseDetailPage() {
   const params = useParams();
   const { user } = useDashboard();
   const [enrolling, setEnrolling] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<any>(null);
   const course = courses.find((c) => c.slug === params.slug);
 
   const handleEnroll = async () => {
@@ -64,8 +67,16 @@ export default function CourseDetailPage() {
           });
 
           if (verifyRes.ok) {
-            alert("Congratulations! You have successfully enrolled in the course.");
-            window.location.href = "/dashboard";
+            setReceiptData({
+              transactionId: response.razorpay_payment_id,
+              amount: course.price,
+              date: new Date().toISOString(),
+              customerName: user?.name,
+              customerEmail: user?.email,
+              itemName: `Enrollment: ${course.title}`,
+              status: "SUCCESS"
+            });
+            setShowReceipt(true);
           } else {
             alert("Payment verification failed. Please contact support.");
           }
@@ -106,6 +117,15 @@ export default function CourseDetailPage() {
   return (
     <ModuleLayout moduleName="courses">
       <div className="space-y-20 pb-20 bg-module">
+        {showReceipt && receiptData && (
+          <ReceiptModal 
+            {...receiptData} 
+            onClose={() => {
+              setShowReceipt(false);
+              window.location.href = "/dashboard";
+            }} 
+          />
+        )}
         
         {/* Hero Section */}
         <section className="relative pt-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

@@ -76,6 +76,19 @@ body {
   transition: all 0.3s ease-in-out;
 }
 
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+
 
 @layer utilities {
   .text-balance {

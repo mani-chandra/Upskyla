@@ -9,17 +9,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { bookingId, field, value } = await req.json();
-
-    if (!["isCheckedIn", "firstRentPaid"].includes(field)) {
-      return NextResponse.json({ message: "Invalid field" }, { status: 400 });
-    }
+    const { bookingId, field, value, roomNumber } = await req.json();
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Update the booking
+      const data: any = {};
+      if (field) {
+        data[field] = value;
+      }
+      if (roomNumber) {
+        data.roomNumber = roomNumber;
+        data.status = "CONFIRMED";
+      }
+
       const booking = await tx.hostelBooking.update({
         where: { id: bookingId },
-        data: { [field]: value },
+        data,
         include: { user: true },
       });
 

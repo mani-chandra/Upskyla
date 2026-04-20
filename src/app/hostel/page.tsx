@@ -30,6 +30,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { ReceiptModal } from "@/components/layout/ReceiptModal";
 
 const services = [
   { id: 1, name: "Gaming Café", icon: Gamepad, color: "text-purple-600", bg: "bg-purple-50", description: "Book high-end gaming slots." },
@@ -68,6 +69,8 @@ function HostelContent() {
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<any>(null);
 
   useEffect(() => {
     fetchStatus();
@@ -123,7 +126,16 @@ function HostelContent() {
           });
 
           if (verifyRes.ok) {
-            alert("Payment successful! Your hostel advance has been paid.");
+            setReceiptData({
+              transactionId: response.razorpay_payment_id,
+              amount: amount,
+              date: new Date().toISOString(),
+              customerName: user?.name,
+              customerEmail: user?.email,
+              itemName: "Hostel Advance Booking",
+              status: "SUCCESS"
+            });
+            setShowReceipt(true);
             fetchStatus();
           } else {
             alert("Payment verification failed. Please contact support.");
@@ -162,6 +174,12 @@ function HostelContent() {
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-12 transition-colors duration-300">
+      {showReceipt && receiptData && (
+        <ReceiptModal 
+          {...receiptData} 
+          onClose={() => setShowReceipt(false)} 
+        />
+      )}
       {!hasBooking ? (
         <>
           {/* Header & Introduction */}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { motion } from "framer-motion";
 import { 
   Users, 
   Settings, 
@@ -32,6 +33,8 @@ export default function AdminDashboardPage() {
   const [hostelBookings, setHostelBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [allotmentData, setAllotmentData] = useState({ block: "A", room: "1", bed: "1" });
 
   useEffect(() => {
     fetchData();
@@ -107,23 +110,40 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const updateHostelStatus = async (bookingId: string, field: string, value: boolean) => {
+  const updateHostelStatus = async (bookingId: string, field: string | null, value: any, roomNumber?: string) => {
     try {
+      const body: any = { bookingId };
+      if (field) {
+        body.field = field;
+        body.value = value;
+      }
+      if (roomNumber) {
+        body.roomNumber = roomNumber;
+      }
+
       const res = await fetch("/api/admin/hostel/update-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId, field, value }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
-        setHostelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, [field]: value } : b));
+        const updated = await res.json();
+        setHostelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updated.booking } : b));
+        setSelectedBooking(null);
         // Refresh referrals if status triggers reward
-        if (field === "isCheckedIn" || field === "firstRentPaid") {
+        if (field === "isCheckedIn" || field === "firstRentPaid" || roomNumber) {
           fetch("/api/admin/referrals").then(res => res.json()).then(data => setReferrals(data.referrals || []));
         }
       }
     } catch (error) {
       console.error("Error updating hostel status:", error);
     }
+  };
+
+  const handleAllotRoom = () => {
+    if (!selectedBooking) return;
+    const roomStr = `${allotmentData.block}-${allotmentData.room} (Bed ${allotmentData.bed})`;
+    updateHostelStatus(selectedBooking.id, null, null, roomStr);
   };
 
   if (dataLoading) {
@@ -139,6 +159,81 @@ export default function AdminDashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-10 pb-16" data-theme="dashboard">
+        {selectedBooking && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl space-y-8"
+            >
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Allot Room</h3>
+                <p className="text-slate-500 font-medium text-sm">Assign a room and bed to {selectedBooking.user.name || selectedBooking.user.email}</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Block</label>
+                    <select 
+                      value={allotmentData.block}
+                      onChange={(e) => setAllotmentData({ ...allotmentData, block: e.target.value })}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm"
+                    >
+                      <option value="A">Block A</option>
+                      <option value="B">Block B</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Room (1-33)</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="33"
+                      value={allotmentData.room}
+                      onChange={(e) => setAllotmentData({ ...allotmentData, room: e.target.value })}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bed Selection (1-4)</label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {["1", "2", "3", "4"].map((bed) => (
+                      <button
+                        key={bed}
+                        onClick={() => setAllotmentData({ ...allotmentData, bed })}
+                        className={cn(
+                          "py-3 rounded-xl font-black text-sm transition-all border",
+                          allotmentData.bed === bed 
+                            ? "bg-accent-primary text-white border-accent-primary shadow-lg shadow-accent-primary/20" 
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                        )}
+                      >
+                        {bed}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button 
+                  onClick={handleAllotRoom}
+                  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all active:scale-95"
+                >
+                  Confirm Allotment
+                </button>
+                <button 
+                  onClick={() => setSelectedBooking(null)}
+                  className="flex-1 py-4 bg-white text-slate-400 border border-slate-200 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all active:scale-95"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight flex items-center">
@@ -234,7 +329,18 @@ export default function AdminDashboardPage() {
                     <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-6 py-4">
                         <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors">{booking.user.name || booking.user.email}</p>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Room: {booking.roomNumber}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                          {booking.roomNumber === "TBD" ? (
+                            <button 
+                              onClick={() => setSelectedBooking(booking)}
+                              className="text-accent-primary hover:underline flex items-center gap-1"
+                            >
+                              <Plus className="h-3 w-3" /> Allot Room
+                            </button>
+                          ) : (
+                            `Room: ${booking.roomNumber}`
+                          )}
+                        </p>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-2">
