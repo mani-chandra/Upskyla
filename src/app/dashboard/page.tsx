@@ -219,7 +219,10 @@ export default function DashboardPage() {
             </div>
             <h3 className="font-bold text-slate-900 mb-1 text-lg">Your Profile is 85% Complete</h3>
             <p className="text-slate-500 text-sm mb-6 max-w-[280px]">Complete your profile to unlock more opportunities and recommendations.</p>
-            <button className="px-6 py-2.5 bg-accent-primary text-white rounded-xl font-bold text-sm hover:bg-accent-secondary transition-all shadow-md shadow-accent-primary/20 hover:scale-105">
+            <button 
+              onClick={() => alert("Opening profile completion wizard... Feature coming soon!")}
+              className="px-6 py-2.5 bg-accent-primary text-white rounded-xl font-bold text-sm hover:bg-accent-secondary transition-all shadow-md shadow-accent-primary/20 hover:scale-105"
+            >
               Complete Profile
             </button>
           </motion.div>

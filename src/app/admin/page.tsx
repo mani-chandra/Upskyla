@@ -154,7 +154,10 @@ export default function AdminDashboardPage() {
             >
               Refresh Data
             </button>
-            <button className="flex items-center px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-xl shadow-slate-900/10 active:scale-95">
+            <button 
+              onClick={() => alert("Opening announcement editor... Feature coming soon!")}
+              className="flex items-center px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+            >
               <Plus className="h-5 w-5 mr-2" />
               New Announcement
             </button>

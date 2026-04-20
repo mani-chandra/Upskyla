@@ -21,7 +21,10 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <button className="p-2 text-slate-400 hover:text-white relative transition-colors">
+        <button 
+          onClick={() => alert("No new notifications at the moment.")}
+          className="p-2 text-slate-400 hover:text-white relative transition-colors"
+        >
           <Bell className="h-6 w-6" />
           <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-accent-primary ring-2 ring-base-navy transition-colors duration-300" />
         </button>

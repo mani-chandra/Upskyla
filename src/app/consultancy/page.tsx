@@ -27,7 +27,10 @@ export default function ConsultancyPage() {
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Trust & <span className="text-accent-primary">Guidance</span></h1>
             <p className="text-slate-500 font-medium mt-1">Plan your career and prepare for international exams with expert mentorship.</p>
           </div>
-          <button className="flex items-center px-8 py-3 bg-accent-primary text-white rounded-2xl font-black text-sm hover:bg-accent-secondary transition-all shadow-xl shadow-accent-primary/20 hover:scale-105 active:scale-95 group">
+          <button 
+            onClick={() => alert("Opening consultation booking calendar... Feature coming soon!")}
+            className="flex items-center px-8 py-3 bg-accent-primary text-white rounded-2xl font-black text-sm hover:bg-accent-secondary transition-all shadow-xl shadow-accent-primary/20 hover:scale-105 active:scale-95 group"
+          >
             <Calendar className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
             Book Consultation
           </button>
@@ -79,7 +82,10 @@ export default function ConsultancyPage() {
                         </div>
                       </div>
                     </div>
-                    <button className="px-6 py-2.5 bg-slate-50 text-slate-900 rounded-xl text-sm font-black hover:bg-accent-primary hover:text-white transition-all shadow-sm flex items-center group/btn">
+                    <button 
+                      onClick={() => alert(`Starting ${exam.title} mock test environment...`)}
+                      className="px-6 py-2.5 bg-slate-50 text-slate-900 rounded-xl text-sm font-black hover:bg-accent-primary hover:text-white transition-all shadow-sm flex items-center group/btn"
+                    >
                       Start
                       <ArrowRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
                     </button>

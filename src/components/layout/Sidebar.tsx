@@ -64,7 +64,7 @@ export function Sidebar() {
         {sidebarItems.map((item, idx) => {
           const flag = flags.find(f => f.name === item.flag);
           const isDisabled = item.flag && flag && !flag.isEnabled;
-          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const isActive = pathname.startsWith(item.href);
 
           return (
             <motion.div

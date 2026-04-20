@@ -56,13 +56,20 @@ async function main() {
   }
 
   // Create Sample Courses
-  await prisma.course.createMany({
-    data: [
-      { title: "Full Stack Development", description: "Learn everything from HTML to Next.js", price: 4999 },
-      { title: "Data Science with Python", description: "Master data analysis and ML", price: 3499 },
-    ],
-    skipDuplicates: true,
-  });
+  const courses = [
+    { id: "fsd", title: "Full Stack Development", description: "Master the art of building complete web applications from scratch.", price: 24999 },
+    { id: "aiml", title: "AI / ML & Data Science", description: "Learn to build intelligent systems and data-driven models.", price: 29999 },
+    { id: "cyber", title: "Cyber Security", description: "Protect digital assets and learn ethical hacking techniques.", price: 27999 },
+    { id: "devops", title: "Cloud & DevOps", description: "Bridge the gap between development and operations with modern tools.", price: 31999 },
+  ];
+
+  for (const course of courses) {
+    await prisma.course.upsert({
+      where: { id: course.id },
+      update: course,
+      create: course,
+    });
+  }
 
   console.log("Seed data created successfully!");
 }

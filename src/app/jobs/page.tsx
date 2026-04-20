@@ -80,7 +80,10 @@ export default function JobsPage() {
               placeholder="Location (e.g., Remote, Bangalore)..."
             />
           </div>
-          <button className="w-full lg:w-auto px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-lg hover:scale-105 active:scale-95">
+          <button 
+            onClick={() => alert("Searching for matching jobs... Feature coming soon!")}
+            className="w-full lg:w-auto px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-lg hover:scale-105 active:scale-95"
+          >
             Find Jobs
           </button>
         </div>
@@ -129,7 +132,10 @@ export default function JobsPage() {
                           <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Applied
                         </span>
                       ) : (
-                        <button className="px-6 py-2.5 bg-slate-50 text-slate-900 rounded-xl text-sm font-black hover:bg-accent-primary hover:text-white transition-all shadow-sm flex items-center group/btn">
+                        <button 
+                          onClick={() => alert(`Redirecting to ${job.company} application portal...`)}
+                          className="px-6 py-2.5 bg-slate-50 text-slate-900 rounded-xl text-sm font-black hover:bg-accent-primary hover:text-white transition-all shadow-sm flex items-center group/btn"
+                        >
                           Apply Now
                           <ArrowRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
                         </button>

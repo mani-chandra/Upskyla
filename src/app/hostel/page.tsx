@@ -93,8 +93,8 @@ function HostelContent() {
   const handleAdvancePayment = async () => {
     setPaying(true);
     try {
-      const hasCoupon = status?.coupons && status.coupons.length > 0;
-      const amount = hasCoupon ? 6000 : 7000;
+      // Auto-applied coupon logic: Amount is now 6000 instead of 7000
+      const amount = 6000;
 
       const res = await fetch("/api/payments/razorpay", {
         method: "POST",
@@ -108,7 +108,7 @@ function HostelContent() {
         amount: order.amount,
         currency: order.currency,
         name: "Upskyla",
-        description: "Hostel Advance Payment",
+        description: "Hostel Advance Payment (Coupon Applied)",
         order_id: order.id,
         handler: async function (response: any) {
           const verifyRes = await fetch("/api/hostel/book", {
@@ -118,7 +118,7 @@ function HostelContent() {
               paymentId: response.razorpay_payment_id,
               orderId: response.razorpay_order_id,
               signature: response.razorpay_signature,
-              couponId: hasCoupon ? status.coupons[0].id : null,
+              couponId: status?.coupons?.[0]?.id || null, // Still use existing coupon if any
             }),
           });
 
@@ -157,7 +157,8 @@ function HostelContent() {
   }
 
   const hasBooking = status?.hostelBooking;
-  const hasCoupon = !!(status?.coupons && status.coupons.length > 0);
+  // Auto-apply coupon UI logic
+  const isCouponApplied = true; 
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-12 transition-colors duration-300">
@@ -226,8 +227,8 @@ function HostelContent() {
                     <div>
                       <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Advance Payment</p>
                       <div className="flex items-center gap-3">
-                        <p className="text-3xl font-black text-slate-900">{formatCurrency(hasCoupon ? 6000 : 7000)}</p>
-                        {hasCoupon && <span className="text-sm line-through text-slate-400 font-bold">{formatCurrency(7000)}</span>}
+                        <p className="text-3xl font-black text-slate-900">{formatCurrency(6000)}</p>
+                        <span className="text-sm line-through text-slate-400 font-bold">{formatCurrency(7000)}</span>
                       </div>
                     </div>
                   </div>
@@ -246,12 +247,10 @@ function HostelContent() {
                       </>
                     )}
                   </button>
-                  {hasCoupon && (
-                    <p className="mt-4 text-sm font-bold text-accent-secondary flex items-center transition-colors duration-300">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Coupon Applied: ₹1,000 Discount Included!
-                    </p>
-                  )}
+                  <p className="mt-4 text-sm font-bold text-accent-secondary flex items-center transition-colors duration-300">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Coupon Applied: ₹1,000 Discount Included!
+                  </p>
                 </div>
               </div>
 

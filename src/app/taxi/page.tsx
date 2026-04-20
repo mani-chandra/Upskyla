@@ -86,7 +86,10 @@ export default function TaxiPage() {
             </div>
 
             <div className="pt-4">
-              <button className="w-full py-4 bg-accent-primary text-white rounded-2xl font-black text-lg hover:bg-accent-secondary transition-all shadow-xl shadow-accent-primary/20 hover:scale-[1.02] active:scale-95 flex items-center justify-center group">
+              <button 
+                onClick={() => alert("Checking vehicle availability in your area... Feature coming soon!")}
+                className="w-full py-4 bg-accent-primary text-white rounded-2xl font-black text-lg hover:bg-accent-secondary transition-all shadow-xl shadow-accent-primary/20 hover:scale-[1.02] active:scale-95 flex items-center justify-center group"
+              >
                 Check Availability
                 <ChevronRight className="h-6 w-6 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
