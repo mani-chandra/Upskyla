@@ -134,16 +134,19 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         setHostelBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...data.booking } : b));
         setSelectedBooking(null);
+        if (roomNumber) {
+          alert(`Successfully alloted room ${roomNumber} to the student!`);
+        }
         // Refresh referrals if status triggers reward
         if (field === "isCheckedIn" || field === "firstRentPaid" || roomNumber) {
           fetch("/api/admin/referrals").then(res => res.json()).then(data => setReferrals(data.referrals || []));
         }
       } else {
-        alert(data.message || "Failed to update status");
+        alert(`Error: ${data.message || "Failed to update status"}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating hostel status:", error);
-      alert("An error occurred. Please try again.");
+      alert(`Network Error: ${error.message || "An unexpected error occurred. Please check your connection."}`);
     } finally {
       setAllotting(false);
     }

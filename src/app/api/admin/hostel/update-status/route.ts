@@ -11,8 +11,21 @@ export async function POST(req: Request) {
 
     const { bookingId, field, value, roomNumber } = await req.json();
 
+    if (!bookingId) {
+      return NextResponse.json({ message: "Booking ID is required" }, { status: 400 });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Update the booking
+      // 1. Check if booking exists
+      const existing = await tx.hostelBooking.findUnique({
+        where: { id: bookingId }
+      });
+
+      if (!existing) {
+        throw new Error("Booking not found");
+      }
+
+      // 2. Prepare update data
       const data: any = {};
       if (field) {
         data[field] = value;
