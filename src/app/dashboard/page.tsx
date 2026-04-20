@@ -85,18 +85,19 @@ const itemVariants: Variants = {
 };
 
 export default function DashboardPage() {
-  const { user, flags } = useDashboard();
+  const { user, flags, setModuleTheme } = useDashboard();
   const [announcements, setAnnouncements] = useState<any[]>([]);
 
   useEffect(() => {
+    setModuleTheme("dashboard");
     setAnnouncements([
       { id: 1, title: "Welcome to the new Platform!", content: "Explore all the new features we've added.", date: "2026-03-19" },
       { id: 2, title: "Hostel Maintenance", content: "Water supply will be interrupted tomorrow for 2 hours.", date: "2026-03-20" },
     ]);
-  }, []);
+  }, [setModuleTheme]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-module min-h-full transition-colors duration-300">
       <motion.div 
         className="space-y-8"
         initial="hidden"
@@ -104,33 +105,33 @@ export default function DashboardPage() {
         variants={containerVariants}
       >
         <motion.div variants={itemVariants}>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back!</h1>
-          <p className="text-gray-500">Here&apos;s what&apos;s happening with your student account today.</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back!</h1>
+          <p className="text-slate-500 mt-1">Here&apos;s what&apos;s happening with your student account today.</p>
         </motion.div>
 
         {/* Announcements Section */}
         <motion.div 
           variants={itemVariants}
-          className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
         >
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">Latest Announcements</h2>
-            <Link href="/announcements" className="text-sm text-primary-600 hover:text-primary-700 font-medium">View all</Link>
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900">Latest Announcements</h2>
+            <Link href="/announcements" className="text-sm text-accent-primary hover:text-accent-secondary font-medium transition-colors">View all</Link>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-slate-100">
             {announcements.map((ann, i) => (
               <motion.div 
                 key={ann.id} 
-                className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                className="px-6 py-4 hover:bg-slate-50 transition-colors"
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900">{ann.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500">{ann.content}</p>
+                    <h3 className="text-sm font-medium text-slate-900">{ann.title}</h3>
+                    <p className="mt-1 text-sm text-slate-500 leading-relaxed">{ann.content}</p>
                   </div>
-                  <span className="text-xs text-gray-400 whitespace-nowrap">{ann.date}</span>
+                  <span className="text-xs text-slate-400 font-medium whitespace-nowrap">{ann.date}</span>
                 </div>
               </motion.div>
             ))}
@@ -153,22 +154,22 @@ export default function DashboardPage() {
                 <Link
                   href={isDisabled ? "#" : module.href}
                   className={cn(
-                    "group relative block h-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md",
+                    "group relative block h-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 transition-all hover:shadow-md hover:border-accent-primary/20",
                     isDisabled && "opacity-75 cursor-not-allowed"
                   )}
                 >
-                  <div className={cn("inline-flex p-3 rounded-lg mb-4 transition-transform group-hover:rotate-12", module.bg, module.color)}>
+                  <div className={cn("inline-flex p-3 rounded-xl mb-4 transition-all group-hover:rotate-12 group-hover:scale-110", module.bg, module.color)}>
                     <module.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center group-hover:text-accent-primary transition-colors">
                     {module.name}
                     {!isDisabled && <ArrowRight className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all" />}
                   </h3>
-                  <p className="text-sm text-gray-500">{module.description}</p>
+                  <p className="text-sm text-slate-500 leading-relaxed">{module.description}</p>
                   
                   {isDisabled && (
                     <div className="absolute top-4 right-4">
-                      <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                      <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm">
                         Launching Soon
                       </span>
                     </div>
@@ -183,27 +184,27 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <motion.div 
             variants={itemVariants}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
           >
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-primary-500" />
+            <h2 className="font-semibold text-slate-900 mb-6 flex items-center">
+              <Clock className="h-5 w-5 mr-2 text-accent-primary" />
               Recent Activity
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {[
-                { text: 'Enrolled in "Advanced Next.js"', time: "2h ago", color: "bg-blue-500" },
-                { text: "Paid Hostel Fee for March", time: "1d ago", color: "bg-green-500" }
+                { text: 'Enrolled in "Advanced Next.js"', time: "2h ago", color: "bg-accent-primary" },
+                { text: "Paid Hostel Fee for March", time: "1d ago", color: "bg-emerald-500" }
               ].map((activity, i) => (
                 <motion.div 
                   key={i} 
                   className="flex items-center text-sm"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + (i * 0.1) }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
                 >
-                  <div className={cn("h-2 w-2 rounded-full mr-3", activity.color)} />
-                  <span className="text-gray-600 flex-1">{activity.text}</span>
-                  <span className="text-gray-400">{activity.time}</span>
+                  <div className={cn("h-2.5 w-2.5 rounded-full mr-4 shadow-sm", activity.color)} />
+                  <p className="text-slate-700 font-medium">{activity.text}</p>
+                  <span className="ml-auto text-slate-400 font-medium text-xs">{activity.time}</span>
                 </motion.div>
               ))}
             </div>
@@ -211,30 +212,16 @@ export default function DashboardPage() {
 
           <motion.div 
             variants={itemVariants}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center items-center text-center"
           >
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center">
-              <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-              Upcoming Deadlines
-            </h2>
-            <div className="space-y-4">
-              {[
-                { text: "Mock Exam: Mathematics", time: "Tomorrow", color: "bg-red-500" },
-                { text: "Consultancy Booking", time: "Mar 25", color: "bg-amber-500" }
-              ].map((deadline, i) => (
-                <motion.div 
-                  key={i} 
-                  className="flex items-center text-sm"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + (i * 0.1) }}
-                >
-                  <div className={cn("h-2 w-2 rounded-full mr-3", deadline.color)} />
-                  <span className="text-gray-600 flex-1">{deadline.text}</span>
-                  <span className="text-gray-400">{deadline.time}</span>
-                </motion.div>
-              ))}
+            <div className="h-16 w-16 bg-accent-primary/10 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle2 className="h-8 w-8 text-accent-primary" />
             </div>
+            <h3 className="font-bold text-slate-900 mb-1 text-lg">Your Profile is 85% Complete</h3>
+            <p className="text-slate-500 text-sm mb-6 max-w-[280px]">Complete your profile to unlock more opportunities and recommendations.</p>
+            <button className="px-6 py-2.5 bg-accent-primary text-white rounded-xl font-bold text-sm hover:bg-accent-secondary transition-all shadow-md shadow-accent-primary/20 hover:scale-105">
+              Complete Profile
+            </button>
           </motion.div>
         </div>
       </motion.div>

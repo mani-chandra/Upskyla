@@ -41,7 +41,7 @@ const itemVariants: Variants = {
 };
 
 export function Sidebar() {
-  const { user, flags } = useDashboard();
+  const { user, flags, moduleTheme } = useDashboard();
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -50,11 +50,11 @@ export function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64 z-20">
+    <div className="flex flex-col h-full bg-base-navy border-r border-slate-800 w-64 z-20 text-slate-300 transition-colors duration-300">
       <div className="p-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic shrink-0">U</div>
-          <h1 className="text-xl font-bold text-primary-600 tracking-tight">
+          <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center text-white font-bold italic shrink-0 transition-colors duration-300">U</div>
+          <h1 className="text-xl font-bold text-white tracking-tight">
             Upskyla
           </h1>
         </div>
@@ -64,6 +64,7 @@ export function Sidebar() {
         {sidebarItems.map((item, idx) => {
           const flag = flags.find(f => f.name === item.flag);
           const isDisabled = item.flag && flag && !flag.isEnabled;
+          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
           return (
             <motion.div
@@ -76,27 +77,27 @@ export function Sidebar() {
               <Link
                 href={isDisabled ? "#" : item.href}
                 className={cn(
-                  "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all group relative",
-                  pathname === item.href
-                    ? "bg-primary-50 text-primary-600 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                  "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all group relative",
+                  isActive
+                    ? "bg-slate-800/50 text-accent-primary shadow-sm"
+                    : "text-slate-400 hover:bg-slate-800/30 hover:text-white",
                   isDisabled && "opacity-50 cursor-not-allowed"
                 )}
               >
                 <item.icon className={cn(
                   "mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
-                  pathname === item.href ? "text-primary-600" : "text-gray-400 group-hover:text-gray-600"
+                  isActive ? "text-accent-primary" : "text-slate-500 group-hover:text-slate-300"
                 )} />
                 {item.name}
                 {isDisabled && (
-                  <span className="ml-auto bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">
+                  <span className="ml-auto bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded">
                     Soon
                   </span>
                 )}
-                {pathname === item.href && (
+                {isActive && (
                   <motion.div 
                     layoutId="sidebar-pill"
-                    className="absolute left-0 w-1 h-6 bg-primary-600 rounded-r-full"
+                    className="absolute left-0 w-1 h-6 bg-accent-primary rounded-r-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -115,21 +116,21 @@ export function Sidebar() {
             <Link
               href="/admin"
               className={cn(
-                "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all group relative",
+                "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all group relative",
                 pathname.startsWith("/admin")
-                  ? "bg-primary-50 text-primary-600 shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-slate-800/50 text-accent-primary shadow-sm"
+                  : "text-slate-400 hover:bg-slate-800/30 hover:text-white"
               )}
             >
               <ShieldCheck className={cn(
                 "mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
-                pathname.startsWith("/admin") ? "text-primary-600" : "text-gray-400 group-hover:text-gray-600"
+                pathname.startsWith("/admin") ? "text-accent-primary" : "text-slate-500 group-hover:text-slate-300"
               )} />
               Admin Panel
               {pathname.startsWith("/admin") && (
                 <motion.div 
                   layoutId="sidebar-pill"
-                  className="absolute left-0 w-1 h-6 bg-primary-600 rounded-r-full"
+                  className="absolute left-0 w-1 h-6 bg-accent-primary rounded-r-full"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -138,10 +139,10 @@ export function Sidebar() {
         )}
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-slate-800">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-red-50 hover:text-red-600 transition-all group"
+          className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all group"
         >
           <LogOut className="mr-3 h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
           Logout

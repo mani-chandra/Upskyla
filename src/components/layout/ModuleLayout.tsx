@@ -20,8 +20,13 @@ export function ModuleLayout({
 }
 
 function ModuleContent({ children, moduleName }: { children: React.ReactNode, moduleName: string }) {
-  const { flags, loading: dashboardLoading } = useDashboard();
+  const { flags, loading: dashboardLoading, setModuleTheme } = useDashboard();
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Set the theme for this module
+    setModuleTheme(moduleName);
+  }, [moduleName, setModuleTheme]);
 
   useEffect(() => {
     if (dashboardLoading) return;

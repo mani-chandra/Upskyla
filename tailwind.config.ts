@@ -9,6 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        base: {
+          navy: 'var(--base-navy)',
+        },
+        accent: {
+          primary: 'var(--accent-primary)',
+          secondary: 'var(--accent-secondary)',
+          highlight: 'var(--accent-highlight)',
+        },
+        module: {
+          bg: 'var(--bg-module)',
+        },
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',

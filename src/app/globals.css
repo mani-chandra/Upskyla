@@ -3,28 +3,79 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Global Base - Deep Navy */
+  --base-navy: #0F172A;
+  
+  /* Dynamic Theme Variables */
+  --accent-primary: #3B82F6;
+  --accent-secondary: #334155;
+  --accent-highlight: #94A3B8;
+  --bg-module: #F1F5F9;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+/* Dashboard Module Theme */
+[data-theme='dashboard'] {
+  --accent-primary: #3B82F6; /* Electric Blue */
+  --accent-secondary: #334155; /* Steel Blue */
+  --bg-module: #F1F5F9; /* Soft Light Gray */
+}
+
+/* Consultancy Module Theme */
+[data-theme='consultancy'] {
+  --accent-primary: #1D4ED8; /* Royal Blue */
+  --accent-secondary: #0D9488; /* Soft Teal */
+  --accent-highlight: #F59E0B; /* Warm Amber */
+  --bg-module: #F8FAFC; /* Off White */
+}
+
+/* Hostel Module Theme */
+[data-theme='hostel'] {
+  --accent-primary: #C2410C; /* Terracotta */
+  --accent-secondary: #65A30D; /* Olive Green */
+  --bg-module: #FFFBEB; /* Cream */
+}
+
+/* Courses Module Theme */
+[data-theme='courses'] {
+  --accent-primary: #312E81; /* Deep Indigo */
+  --accent-secondary: #2563EB; /* Vibrant Blue */
+  --accent-highlight: #22D3EE; /* Neon Cyan */
+  --bg-module: #EFF6FF; /* Very Light Blue */
+}
+
+/* Taxi Module Theme */
+[data-theme='taxi'] {
+  --accent-primary: #F97316; /* Bold Orange */
+  --accent-secondary: #1F2937; /* Charcoal */
+  --accent-highlight: #FACC15; /* Bright Yellow */
+  --bg-module: #F9FAFB; /* Light Neutral */
+}
+
+/* Jobs Module Theme */
+[data-theme='jobs'] {
+  --accent-primary: #047857; /* Emerald */
+  --accent-secondary: #1E293B; /* Dark Slate */
+  --accent-highlight: #38BDF8; /* Sky Blue */
+  --bg-module: #F1F5F9; /* Light Gray */
+}
+
+/* Wallet Module Theme */
+[data-theme='wallet'] {
+  --accent-primary: #059669; /* Rich Green */
+  --accent-secondary: #0B132B; /* Dark Navy */
+  --accent-highlight: #D4AF37; /* Gold */
+  --bg-module: #ECFDF5; /* Mint */
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: var(--bg-module);
+  transition: background-color 0.3s ease-in-out;
 }
+
+.module-transition {
+  transition: all 0.3s ease-in-out;
+}
+
 
 @layer utilities {
   .text-balance {

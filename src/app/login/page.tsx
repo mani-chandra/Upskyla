@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, Mail, ArrowRight, GraduationCap, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useDashboard } from "@/lib/context/DashboardContext";
 
 export default function LoginPage() {
+  const { refreshUser } = useDashboard();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,8 +31,9 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
+        // Refresh the user context before redirecting
+        await refreshUser();
         router.push("/dashboard");
-        router.refresh();
       } else {
         setError(data.message || "Login failed");
       }

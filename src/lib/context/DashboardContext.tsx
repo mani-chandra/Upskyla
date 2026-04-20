@@ -6,6 +6,8 @@ interface DashboardContextType {
   user: any;
   flags: any[];
   loading: boolean;
+  moduleTheme: string;
+  setModuleTheme: (theme: string) => void;
   refreshUser: () => Promise<void>;
 }
 
@@ -15,6 +17,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [flags, setFlags] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [moduleTheme, setModuleTheme] = useState("dashboard");
 
   const fetchData = async () => {
     try {
@@ -56,7 +59,14 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <DashboardContext.Provider value={{ user, flags, loading, refreshUser: fetchData }}>
+    <DashboardContext.Provider value={{ 
+      user, 
+      flags, 
+      loading, 
+      moduleTheme, 
+      setModuleTheme, 
+      refreshUser: fetchData 
+    }}>
       {children}
     </DashboardContext.Provider>
   );
