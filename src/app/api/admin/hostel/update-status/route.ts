@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       }
       if (roomNumber) {
         data.roomNumber = roomNumber;
-        data.status = "CONFIRMED";
+        data.status = "APPROVED";
       }
 
       const booking = await tx.hostelBooking.update({

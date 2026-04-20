@@ -36,6 +36,9 @@ export default function AdminDashboardPage() {
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [allotmentData, setAllotmentData] = useState({ block: "A", room: "1", bed: "1" });
   const [allotting, setAllotting] = useState(false);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [announcementData, setAnnouncementData] = useState({ title: "", content: "", module: "GLOBAL" });
+  const [creatingAnnouncement, setCreatingAnnouncement] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -162,6 +165,33 @@ export default function AdminDashboardPage() {
     updateHostelStatus(selectedBooking.id, null, null, roomStr);
   };
 
+  const handleCreateAnnouncement = async () => {
+    if (!announcementData.title || !announcementData.content) {
+      alert("Title and content are required");
+      return;
+    }
+    setCreatingAnnouncement(true);
+    try {
+      const res = await fetch("/api/announcements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(announcementData),
+      });
+      if (res.ok) {
+        alert("Announcement created successfully!");
+        setShowAnnouncementModal(false);
+        setAnnouncementData({ title: "", content: "", module: "GLOBAL" });
+      } else {
+        const data = await res.json();
+        alert(`Error: ${data.message || "Failed to create announcement"}`);
+      }
+    } catch (error) {
+      alert("Network Error: Failed to create announcement");
+    } finally {
+      setCreatingAnnouncement(false);
+    }
+  };
+
   if (dataLoading) {
     return (
       <DashboardLayout>
@@ -251,6 +281,73 @@ export default function AdminDashboardPage() {
             </motion.div>
           </div>
         )}
+
+        {showAnnouncementModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl space-y-8"
+            >
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">New Announcement</h3>
+                <p className="text-slate-500 font-medium text-sm">Post a message to the platform for all users.</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Announcement Title</label>
+                  <input 
+                    type="text" 
+                    placeholder="Important: Maintenance update..."
+                    value={announcementData.title}
+                    onChange={(e) => setAnnouncementData({ ...announcementData, title: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Target Module</label>
+                  <select 
+                    value={announcementData.module}
+                    onChange={(e) => setAnnouncementData({ ...announcementData, module: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm"
+                  >
+                    <option value="GLOBAL">Global (All)</option>
+                    <option value="HOSTEL">Hostel Module</option>
+                    <option value="COURSES">Courses (LMS)</option>
+                    <option value="ADMIN">Admin Only</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Content</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Enter announcement details here..."
+                    value={announcementData.content}
+                    onChange={(e) => setAnnouncementData({ ...announcementData, content: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button 
+                  onClick={handleCreateAnnouncement}
+                  disabled={creatingAnnouncement}
+                  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center"
+                >
+                  {creatingAnnouncement ? <Loader2 className="h-5 w-5 animate-spin" /> : "Post Announcement"}
+                </button>
+                <button 
+                  onClick={() => setShowAnnouncementModal(false)}
+                  className="flex-1 py-4 bg-white text-slate-400 border border-slate-200 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all active:scale-95"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight flex items-center">
@@ -267,7 +364,7 @@ export default function AdminDashboardPage() {
               Refresh Data
             </button>
             <button 
-              onClick={() => alert("Opening announcement editor... Feature coming soon!")}
+              onClick={() => setShowAnnouncementModal(true)}
               className="flex items-center px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-xl shadow-slate-900/10 active:scale-95"
             >
               <Plus className="h-5 w-5 mr-2" />
