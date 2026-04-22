@@ -615,12 +615,12 @@ export default function AdminDashboardPage() {
                         <input 
                           type="url" 
                           placeholder="https://drive.google.com/file/..."
-                          value={editingCourseUrl.url}
-                          onChange={(e) => setEditingCourseUrl({ ...editingCourseUrl, url: e.target.value })}
+                          value={editingCourseUrl!.url}
+                          onChange={(e) => setEditingCourseUrl({ ...editingCourseUrl!, url: e.target.value })}
                           className="flex-grow px-4 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs focus:ring-2 focus:ring-accent-primary focus:border-accent-primary outline-none transition-all"
                         />
                         <button 
-                          onClick={() => handleUpdateSyllabusUrl(course.id, editingCourseUrl.url)}
+                          onClick={() => handleUpdateSyllabusUrl(course.id, editingCourseUrl!.url)}
                           className="px-6 py-2.5 bg-accent-primary text-white rounded-xl font-black text-xs hover:bg-accent-secondary transition-all active:scale-95"
                         >
                           Save Link
