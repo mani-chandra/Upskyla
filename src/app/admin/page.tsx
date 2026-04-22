@@ -254,14 +254,17 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({ courseId, curriculumPdf: url }),
       });
 
+      const data = await res.json();
+      console.log("Update syllabus response:", res.status, data);
+
       if (res.ok) {
-        setCourses(prev => prev.map(c => 
+        setCourses(prev => prev.map(c =>
           c.id === courseId ? { ...c, curriculumPdf: url } : c
         ));
         setEditingCourseUrl(null);
         alert("Syllabus URL updated successfully!");
       } else {
-        alert("Failed to update syllabus URL");
+        alert(`Failed to update syllabus URL: ${data.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error updating syllabus URL:", error);

@@ -8,10 +8,274 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Role {
-  STUDENT
-  ADMIN
-  STAFF
+model Announcement {
+  id        String   @id
+  title     String
+  content   String
+  module    String   @default("GLOBAL")
+  createdAt DateTime @default(now())
+}
+
+model ComplaintTicket {
+  id          String          @id
+  userId      String
+  subject     String
+  description String
+  status      ComplaintStatus @default(OPEN)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime
+  User        User            @relation(fields: [userId], references: [id])
+}
+
+model ConsultationBooking {
+  id        String        @id
+  userId    String
+  date      DateTime
+  status    BookingStatus @default(PENDING)
+  notes     String?
+  paymentId String?       @unique
+  createdAt DateTime      @default(now())
+  Payment   Payment?      @relation(fields: [paymentId], references: [id])
+  User      User          @relation(fields: [userId], references: [id])
+}
+
+model Coupon {
+  id        String    @id
+  userId    String
+  code      String    @unique
+  amount    Float     @default(1000)
+  isUsed    Boolean   @default(false)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  User      User      @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id            String       @id
+  title         String
+  description   String
+  price         Float
+  thumbnail     String?
+  createdAt     DateTime     @default(now())
+  curriculumPdf String?
+  Enrollment    Enrollment[]
+  Lesson        Lesson[]
+}
+
+model Enrollment {
+  id         String   @id
+  userId     String
+  courseId   String
+  progress   Int      @default(0)
+  completed  Boolean  @default(false)
+  paymentId  String?  @unique
+  enrolledAt DateTime @default(now())
+  Course     Course   @relation(fields: [courseId], references: [id])
+  Payment    Payment? @relation(fields: [paymentId], references: [id])
+  User       User     @relation(fields: [userId], references: [id])
+}
+
+model Exam {
+  id          String        @id
+  title       String
+  description String?
+  duration    Int
+  questions   Json
+  createdAt   DateTime      @default(now())
+  ExamAttempt ExamAttempt[]
+}
+
+model ExamAttempt {
+  id          String   @id
+  userId      String
+  examId      String
+  score       Int
+  answers     Json
+  completedAt DateTime @default(now())
+  Exam        Exam     @relation(fields: [examId], references: [id])
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+model FeatureFlag {
+  id          String   @id
+  name        String   @unique
+  isEnabled   Boolean  @default(true)
+  description String?
+  updatedAt   DateTime
+}
+
+model GamingBooking {
+  id        String        @id
+  userId    String
+  slot      DateTime
+  duration  Int
+  status    BookingStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  User      User          @relation(fields: [userId], references: [id])
+}
+
+model HostelBooking {
+  id            String        @id
+  userId        String        @unique
+  roomNumber    String
+  status        BookingStatus @default(PENDING)
+  checkIn       DateTime
+  checkOut      DateTime?
+  paymentId     String?       @unique
+  isCheckedIn   Boolean       @default(false)
+  firstRentPaid Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  Payment       Payment?      @relation(fields: [paymentId], references: [id])
+  User          User          @relation(fields: [userId], references: [id])
+}
+
+model JobApplication {
+  id         String        @id
+  jobId      String
+  userId     String
+  resumeUrl  String
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  JobListing JobListing    @relation(fields: [jobId], references: [id])
+  User       User          @relation(fields: [userId], references: [id])
+}
+
+model JobListing {
+  id             String           @id
+  title          String
+  company        String
+  description    String
+  location       String
+  salary         String?
+  createdAt      DateTime         @default(now())
+  JobApplication JobApplication[]
+}
+
+model Lesson {
+  id        String   @id
+  courseId  String
+  title     String
+  videoUrl  String
+  order     Int
+  createdAt DateTime @default(now())
+  Course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Payment {
+  id                  String               @id
+  amount              Float
+  currency            String               @default("INR")
+  provider            String               @default("RAZORPAY")
+  providerId          String               @unique
+  status              String
+  createdAt           DateTime             @default(now())
+  ConsultationBooking ConsultationBooking?
+  Enrollment          Enrollment?
+  HostelBooking       HostelBooking?
+  TaxiBooking         TaxiBooking?
+}
+
+model Profile {
+  id        String  @id
+  userId    String  @unique
+  phone     String?
+  address   String?
+  avatar    String?
+  resumeUrl String?
+  User      User    @relation(fields: [userId], references: [id])
+}
+
+model Referral {
+  id                                 String         @id
+  referrerId                         String
+  referredUserId                     String         @unique
+  status                             ReferralStatus @default(REGISTERED)
+  rewardAmount                       Float          @default(750)
+  createdAt                          DateTime       @default(now())
+  updatedAt                          DateTime
+  User_Referral_referredUserIdToUser User           @relation("Referral_referredUserIdToUser", fields: [referredUserId], references: [id])
+  User_Referral_referrerIdToUser     User           @relation("Referral_referrerIdToUser", fields: [referrerId], references: [id])
+}
+
+model TaxiBooking {
+  id         String        @id
+  userId     String
+  vehicleId  String?
+  type       String
+  pickupTime DateTime
+  status     BookingStatus @default(PENDING)
+  paymentId  String?       @unique
+  createdAt  DateTime      @default(now())
+  Payment    Payment?      @relation(fields: [paymentId], references: [id])
+  User       User          @relation(fields: [userId], references: [id])
+  Vehicle    Vehicle?      @relation(fields: [vehicleId], references: [id])
+}
+
+model TheatreBooking {
+  id        String        @id
+  userId    String
+  slot      DateTime
+  duration  Int
+  status    BookingStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  User      User          @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id                                     String                @id
+  email                                  String                @unique
+  password                               String
+  name                                   String?
+  role                                   Role                  @default(STUDENT)
+  createdAt                              DateTime              @default(now())
+  updatedAt                              DateTime
+  resetToken                             String?               @unique
+  resetTokenExpiry                       DateTime?
+  referralCode                           String                @unique
+  referredByCode                         String?
+  ComplaintTicket                        ComplaintTicket[]
+  ConsultationBooking                    ConsultationBooking[]
+  Coupon                                 Coupon[]
+  Enrollment                             Enrollment[]
+  ExamAttempt                            ExamAttempt[]
+  GamingBooking                          GamingBooking[]
+  HostelBooking                          HostelBooking?
+  JobApplication                         JobApplication[]
+  Profile                                Profile?
+  Referral_Referral_referredUserIdToUser Referral?             @relation("Referral_referredUserIdToUser")
+  Referral_Referral_referrerIdToUser     Referral[]            @relation("Referral_referrerIdToUser")
+  TaxiBooking                            TaxiBooking[]
+  TheatreBooking                         TheatreBooking[]
+  Wallet                                 Wallet?
+  WalletTransaction                      WalletTransaction[]
+}
+
+model Vehicle {
+  id           String        @id
+  name         String
+  type         String
+  plateNumber  String        @unique
+  isAvailable  Boolean       @default(true)
+  pricePerHour Float
+  TaxiBooking  TaxiBooking[]
+}
+
+model Wallet {
+  id      String @id
+  userId  String @unique
+  balance Float  @default(0)
+  User    User   @relation(fields: [userId], references: [id])
+}
+
+model WalletTransaction {
+  id         String                  @id
+  userId     String
+  amount     Float
+  type       WalletTransactionType
+  status     WalletTransactionStatus @default(PENDING)
+  referralId String?
+  createdAt  DateTime                @default(now())
+  User       User                    @relation(fields: [userId], references: [id])
 }
 
 enum BookingStatus {
@@ -35,6 +299,12 @@ enum ReferralStatus {
   ELIGIBLE_FOR_WITHDRAWAL
 }
 
+enum Role {
+  STUDENT
+  ADMIN
+  STAFF
+}
+
 enum WalletTransactionStatus {
   PENDING
   APPROVED
@@ -44,293 +314,4 @@ enum WalletTransactionStatus {
 enum WalletTransactionType {
   CREDIT
   DEBIT
-}
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String?
-  role          Role      @default(STUDENT)
-  profile       Profile?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Password Reset Fields
-  resetToken       String?   @unique
-  resetTokenExpiry DateTime?
-
-  // Referral Fields
-  referralCode  String    @unique @default(cuid())
-  referredByCode String?
-
-  // Relationships
-  consultations ConsultationBooking[]
-  examAttempts  ExamAttempt[]
-  hostelBooking HostelBooking?
-  complaints    ComplaintTicket[]
-  gamingBookings GamingBooking[]
-  theatreBookings TheatreBooking[]
-  enrollments   Enrollment[]
-  taxiBookings  TaxiBooking[]
-  jobApplications JobApplication[]
-
-  referralsMade     Referral[] @relation("Referrer")
-  referralReceived  Referral?  @relation("ReferredUser")
-  wallet            Wallet?
-  walletTransactions WalletTransaction[]
-  coupons           Coupon[]
-}
-
-model Profile {
-  id        String  @id @default(cuid())
-  userId    String  @unique
-  user      User    @relation(fields: [userId], references: [id])
-  phone     String?
-  address   String?
-  avatar    String?
-  resumeUrl String?
-}
-
-model FeatureFlag {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  isEnabled   Boolean  @default(true)
-  description String?
-  updatedAt   DateTime @updatedAt
-}
-
-model Announcement {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  module    String   @default("GLOBAL") // GLOBAL, HOSTEL, CONSULTANCY, LMS, etc.
-  createdAt DateTime @default(now())
-}
-
-// CONSULTANCY MODULE
-model ConsultationBooking {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  date        DateTime
-  status      BookingStatus @default(PENDING)
-  notes       String?
-  paymentId   String?       @unique
-  payment     Payment?      @relation(fields: [paymentId], references: [id])
-  createdAt   DateTime      @default(now())
-}
-
-model Exam {
-  id          String        @id @default(cuid())
-  title       String
-  description String?
-  duration    Int           // in minutes
-  questions   Json          // Store MCQs as JSON
-  attempts    ExamAttempt[]
-  createdAt   DateTime      @default(now())
-}
-
-model ExamAttempt {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  examId    String
-  exam      Exam     @relation(fields: [examId], references: [id])
-  score     Int
-  answers   Json
-  completedAt DateTime @default(now())
-}
-
-// HOSTEL MODULE
-model HostelBooking {
-  id          String        @id @default(cuid())
-  userId      String        @unique
-  user        User          @relation(fields: [userId], references: [id])
-  roomNumber  String
-  status      BookingStatus @default(PENDING)
-  checkIn     DateTime
-  checkOut    DateTime?
-  paymentId   String?       @unique
-  payment     Payment?      @relation(fields: [paymentId], references: [id])
-  
-  // New Fields for Referral Logic
-  isCheckedIn   Boolean      @default(false)
-  firstRentPaid Boolean      @default(false)
-  
-  createdAt   DateTime      @default(now())
-}
-
-model ComplaintTicket {
-  id          String          @id @default(cuid())
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
-  subject     String
-  description String
-  status      ComplaintStatus @default(OPEN)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-}
-
-model GamingBooking {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
-  slot      DateTime
-  duration  Int           // in minutes
-  status    BookingStatus @default(PENDING)
-  createdAt DateTime      @default(now())
-}
-
-model TheatreBooking {
-  id        String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  slot      DateTime
-  duration  Int           // in minutes
-  status    BookingStatus @default(PENDING)
-  createdAt DateTime      @default(now())
-}
-
-// REFERRAL & WALLET MODELS
-model Referral {
-  id             String         @id @default(cuid())
-  referrerId     String
-  referrer       User           @relation("Referrer", fields: [referrerId], references: [id])
-  referredUserId String         @unique
-  referredUser   User           @relation("ReferredUser", fields: [referredUserId], references: [id])
-  status         ReferralStatus @default(REGISTERED)
-  rewardAmount   Float          @default(750)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-}
-
-model Wallet {
-  id      String @id @default(cuid())
-  userId  String @unique
-  user    User   @relation(fields: [userId], references: [id])
-  balance Float  @default(0)
-}
-
-model WalletTransaction {
-  id             String                  @id @default(cuid())
-  userId         String
-  user           User                    @relation(fields: [userId], references: [id])
-  amount         Float
-  type           WalletTransactionType
-  status         WalletTransactionStatus @default(PENDING)
-  referralId     String?                 // ID of the referral this transaction is linked to
-  createdAt      DateTime                @default(now())
-}
-
-model Coupon {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  code      String   @unique
-  amount    Float    @default(1000)
-  isUsed    Boolean  @default(false)
-  expiresAt DateTime?
-  createdAt DateTime @default(now())
-}
-
-// COURSE LMS MODULE
-model Course {
-  id            String       @id @default(cuid())
-  title         String
-  description   String
-  price         Float
-  thumbnail     String?
-  curriculumPdf String?
-  lessons       Lesson[]
-  enrollments   Enrollment[]
-  createdAt     DateTime     @default(now())
-}
-
-model Lesson {
-  id        String   @id @default(cuid())
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id])
-  title     String
-  videoUrl  String
-  order     Int
-  createdAt DateTime @default(now())
-}
-
-model Enrollment {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id])
-  progress  Int      @default(0)
-  completed Boolean  @default(false)
-  paymentId String?  @unique
-  payment   Payment? @relation(fields: [paymentId], references: [id])
-  enrolledAt DateTime @default(now())
-}
-
-// TAXI & VEHICLE MODULE
-model Vehicle {
-  id          String   @id @default(cuid())
-  name        String
-  type        String   // CAR, BIKE, etc.
-  plateNumber String   @unique
-  isAvailable Boolean  @default(true)
-  pricePerHour Float
-  bookings    TaxiBooking[]
-}
-
-model TaxiBooking {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  vehicleId   String?
-  vehicle     Vehicle?      @relation(fields: [vehicleId], references: [id])
-  type        String        // AIRPORT_PICKUP, HOURLY, RENTAL
-  pickupTime  DateTime
-  status      BookingStatus @default(PENDING)
-  paymentId   String?       @unique
-  payment     Payment?      @relation(fields: [paymentId], references: [id])
-  createdAt   DateTime      @default(now())
-}
-
-// CAREER / JOB PORTAL
-model JobListing {
-  id          String           @id @default(cuid())
-  title       String
-  company     String
-  description String
-  location    String
-  salary      String?
-  applications JobApplication[]
-  createdAt   DateTime         @default(now())
-}
-
-model JobApplication {
-  id          String        @id @default(cuid())
-  jobId       String
-  job         JobListing    @relation(fields: [jobId], references: [id])
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  resumeUrl   String
-  status      BookingStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-}
-
-// PAYMENTS
-model Payment {
-  id            String   @id @default(cuid())
-  amount        Float
-  currency      String   @default("INR")
-  provider      String   @default("RAZORPAY")
-  providerId    String   @unique // Razorpay Order ID
-  status        String   // created, captured, failed
-  createdAt     DateTime @default(now())
-
-  // Reverse relations
-  consultation ConsultationBooking?
-  hostel       HostelBooking?
-  enrollment   Enrollment?
-  taxi         TaxiBooking?
 }
