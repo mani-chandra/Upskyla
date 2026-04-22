@@ -199,7 +199,6 @@ export default function AdminDashboardPage() {
 
   const handleFileUpload = async (courseId: string, file: File) => {
     if (!file) return;
-    console.log(`Starting upload for course: ${courseId}, file: ${file.name}`);
     setUploadingCourseId(courseId);
     
     const formData = new FormData();
@@ -207,13 +206,10 @@ export default function AdminDashboardPage() {
     formData.append("courseId", courseId);
 
     try {
-      console.log("Fetching /api/admin/courses/upload...");
       const res = await fetch("/api/admin/courses/upload", {
         method: "POST",
         body: formData,
       });
-
-      console.log("Response status:", res.status);
 
       if (res.ok) {
         const data = await res.json();
