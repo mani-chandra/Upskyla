@@ -69,7 +69,19 @@ export default function AdminDashboardPage() {
       setWithdrawals(withdrawalsData || []);
       setUsers(usersData || []);
       setHostelBookings(hostelData || []);
-      setCourses(coursesData || initialCourses);
+
+      // Merge with initialCourses to preserve icon components
+      const mergedCourses = initialCourses.map(initialCourse => {
+        const fetchedCourse = (coursesData || []).find((c: any) => c.id === initialCourse.id);
+        if (fetchedCourse) {
+          return {
+            ...initialCourse,
+            curriculumPdf: fetchedCourse.curriculumPdf || initialCourse.curriculumPdf
+          };
+        }
+        return initialCourse;
+      });
+      setCourses(mergedCourses);
     } catch (error) {
       console.error("Error fetching admin data:", error);
     } finally {

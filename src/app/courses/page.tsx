@@ -19,7 +19,18 @@ export default function CoursesPage() {
         const res = await fetch("/api/courses");
         if (res.ok) {
           const data = await res.json();
-          setCourses(data);
+          // Merge with initialCourses to preserve icon components and other non-serializable data
+          const mergedData = initialCourses.map(initialCourse => {
+            const fetchedCourse = data.find((c: any) => c.id === initialCourse.id);
+            if (fetchedCourse) {
+              return {
+                ...initialCourse,
+                curriculumPdf: fetchedCourse.curriculumPdf || initialCourse.curriculumPdf
+              };
+            }
+            return initialCourse;
+          });
+          setCourses(mergedData);
         }
       } catch (error) {
         console.error("Error fetching courses:", error);
