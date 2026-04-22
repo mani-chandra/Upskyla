@@ -23,7 +23,9 @@ import {
   Home,
   DollarSign,
   FileText,
-  Upload
+  Upload,
+  Link as LinkIcon,
+  AlertCircle
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { courses as initialCourses } from "@/lib/courses-data";
@@ -44,6 +46,7 @@ export default function AdminDashboardPage() {
   const [announcementData, setAnnouncementData] = useState({ title: "", content: "", module: "GLOBAL" });
   const [creatingAnnouncement, setCreatingAnnouncement] = useState(false);
   const [uploadingCourseId, setUploadingCourseId] = useState<string | null>(null);
+  const [editingCourseUrl, setEditingCourseUrl] = useState<{ id: string, url: string } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -227,6 +230,14 @@ export default function AdminDashboardPage() {
     } finally {
       setUploadingCourseId(null);
     }
+  };
+
+  const handleUpdateSyllabusUrl = (courseId: string, url: string) => {
+    setCourses(prev => prev.map(c => 
+      c.id === courseId ? { ...c, curriculumPdf: url } : c
+    ));
+    setEditingCourseUrl(null);
+    alert("Syllabus URL updated successfully!");
   };
 
   if (dataLoading) {
@@ -517,58 +528,105 @@ export default function AdminDashboardPage() {
           {/* Course Curriculum Management */}
           <AdminCard title="Course Syllabus Management" icon={FileText} badge={`${courses.length} Courses`}>
             <div className="space-y-6">
+              {/* Serverless Warning */}
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100 flex gap-3 items-start">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-xs font-black text-amber-900 uppercase tracking-tight">Deployment Note</p>
+                  <p className="text-[10px] font-medium text-amber-700 leading-relaxed">
+                    Direct file uploads are only supported in local development. For production (Vercel), please provide an external URL (Google Drive, Dropbox, etc.) to ensure the syllabus is always accessible.
+                  </p>
+                </div>
+              </div>
+
               {courses.map((course) => (
                 <div key={course.id} className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 group hover:border-accent-primary/30 transition-all">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className={cn("p-3 rounded-xl bg-white shadow-sm", course.color)}>
-                        <course.icon className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">{course.title}</h4>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          {course.curriculumPdf ? "Syllabus Uploaded" : "No Syllabus Found"}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      {course.curriculumPdf && (
-                        <a 
-                          href={course.curriculumPdf} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="p-2.5 bg-white text-slate-400 hover:text-accent-primary rounded-xl border border-slate-200 shadow-sm transition-all"
-                          title="View Current PDF"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                      <label className="relative cursor-pointer">
-                        <input 
-                          type="file" 
-                          accept=".pdf"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload(course.id, file);
-                          }}
-                        />
-                        <div className={cn(
-                          "flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs transition-all shadow-sm active:scale-95",
-                          uploadingCourseId === course.id 
-                            ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
-                            : "bg-slate-900 text-white hover:bg-accent-primary"
-                        )}>
-                          {uploadingCourseId === course.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Upload className="w-3.5 h-3.5" />
-                          )}
-                          {course.curriculumPdf ? "Update PDF" : "Upload PDF"}
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className={cn("p-3 rounded-xl bg-white shadow-sm", course.color)}>
+                          <course.icon className="w-6 h-6" />
                         </div>
-                      </label>
+                        <div>
+                          <h4 className="text-sm font-black text-slate-900">{course.title}</h4>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[200px]">
+                            {course.curriculumPdf ? (
+                              <span className="text-emerald-600">Syllabus: {course.curriculumPdf.split('/').pop()}</span>
+                            ) : "No Syllabus Found"}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        {course.curriculumPdf && (
+                          <a 
+                            href={course.curriculumPdf} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="p-2.5 bg-white text-slate-400 hover:text-accent-primary rounded-xl border border-slate-200 shadow-sm transition-all"
+                            title="View Current Syllabus"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+                        <button 
+                          onClick={() => setEditingCourseUrl(editingCourseUrl?.id === course.id ? null : { id: course.id, url: course.curriculumPdf || "" })}
+                          className={cn(
+                            "p-2.5 rounded-xl border transition-all shadow-sm active:scale-95",
+                            editingCourseUrl?.id === course.id ? "bg-accent-primary text-white border-accent-primary" : "bg-white text-slate-400 border-slate-200 hover:text-accent-primary"
+                          )}
+                          title="Edit Syllabus URL"
+                        >
+                          <LinkIcon className="w-4 h-4" />
+                        </button>
+                        <label className="relative cursor-pointer">
+                          <input 
+                            type="file" 
+                            accept=".pdf"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFileUpload(course.id, file);
+                            }}
+                          />
+                          <div className={cn(
+                            "flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs transition-all shadow-sm active:scale-95",
+                            uploadingCourseId === course.id 
+                              ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                              : "bg-slate-900 text-white hover:bg-accent-primary"
+                          )}>
+                            {uploadingCourseId === course.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Upload className="w-3.5 h-3.5" />
+                            )}
+                            <span className="hidden sm:inline">Upload File</span>
+                          </div>
+                        </label>
+                      </div>
                     </div>
+
+                    {editingCourseUrl?.id === course.id && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="pt-2 flex gap-3"
+                      >
+                        <input 
+                          type="url" 
+                          placeholder="https://drive.google.com/file/..."
+                          value={editingCourseUrl.url}
+                          onChange={(e) => setEditingCourseUrl({ ...editingCourseUrl, url: e.target.value })}
+                          className="flex-grow px-4 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs focus:ring-2 focus:ring-accent-primary focus:border-accent-primary outline-none transition-all"
+                        />
+                        <button 
+                          onClick={() => handleUpdateSyllabusUrl(course.id, editingCourseUrl.url)}
+                          className="px-6 py-2.5 bg-accent-primary text-white rounded-xl font-black text-xs hover:bg-accent-secondary transition-all active:scale-95"
+                        >
+                          Save Link
+                        </button>
+                      </motion.div>
+                    )}
                   </div>
                 </div>
               ))}
