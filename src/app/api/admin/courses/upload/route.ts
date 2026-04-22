@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // 60 seconds
@@ -52,6 +53,12 @@ export async function POST(req: Request) {
     await writeFile(filePath, buffer);
 
     const publicPath = `/docs/curriculum/${fileName}`;
+
+    // Update the course in the database with the new PDF path
+    await prisma.course.update({
+      where: { id: courseId },
+      data: { curriculumPdf: publicPath }
+    });
     
     return NextResponse.json({ 
       message: "File uploaded successfully",

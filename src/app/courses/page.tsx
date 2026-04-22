@@ -1,17 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ModuleLayout } from "@/components/layout/ModuleLayout";
 import { CourseCard } from "@/components/courses/CourseCard";
-import { courses } from "@/lib/courses-data";
-import { Sparkles, ArrowRight, CheckCircle2, Trophy, Rocket, Users2, Code2, BrainCircuit, Video } from "lucide-react";
+import { courses as initialCourses } from "@/lib/courses-data";
+import { Sparkles, ArrowRight, CheckCircle2, Trophy, Rocket, Users2, Code2, BrainCircuit, Video, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function CoursesPage() {
+  const [courses, setCourses] = useState<any[]>(initialCourses);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/courses");
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(data);
+        }
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
   return (
     <ModuleLayout moduleName="courses">
-      <div className="relative space-y-12 md:space-y-20 pb-20 bg-module transition-colors duration-300 px-4 sm:px-0 overflow-hidden">
+      {loading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+        </div>
+      ) : (
+        <div className="relative space-y-12 md:space-y-20 pb-20 bg-module transition-colors duration-300 px-4 sm:px-0 overflow-hidden">
+          {/* ... existing content ... */}
         
         {/* Background Decorations */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10">
@@ -228,6 +255,7 @@ export default function CoursesPage() {
         </section>
 
       </div>
+      )}
     </ModuleLayout>
   );
 }

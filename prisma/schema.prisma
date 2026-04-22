@@ -236,14 +236,15 @@ model Coupon {
 
 // COURSE LMS MODULE
 model Course {
-  id          String       @id @default(cuid())
-  title       String
-  description String
-  price       Float
-  thumbnail   String?
-  lessons     Lesson[]
-  enrollments Enrollment[]
-  createdAt   DateTime     @default(now())
+  id            String       @id @default(cuid())
+  title         String
+  description   String
+  price         Float
+  thumbnail     String?
+  curriculumPdf String?
+  lessons       Lesson[]
+  enrollments   Enrollment[]
+  createdAt     DateTime     @default(now())
 }
 
 model Lesson {

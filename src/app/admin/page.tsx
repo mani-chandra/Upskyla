@@ -55,12 +55,13 @@ export default function AdminDashboardPage() {
   const fetchData = async () => {
     setDataLoading(true);
     try {
-      const [flagsData, referralsData, withdrawalsData, usersData, hostelData] = await Promise.all([
+      const [flagsData, referralsData, withdrawalsData, usersData, hostelData, coursesData] = await Promise.all([
         fetch("/api/feature-flags").then(res => res.json()),
         fetch("/api/admin/referrals").then(res => res.json()),
         fetch("/api/admin/withdrawals").then(res => res.json()),
         fetch("/api/admin/users").then(res => res.json()),
-        fetch("/api/admin/hostel/bookings").then(res => res.json())
+        fetch("/api/admin/hostel/bookings").then(res => res.json()),
+        fetch("/api/courses").then(res => res.json())
       ]);
 
       setFlags(flagsData);
@@ -68,6 +69,7 @@ export default function AdminDashboardPage() {
       setWithdrawals(withdrawalsData || []);
       setUsers(usersData || []);
       setHostelBookings(hostelData || []);
+      setCourses(coursesData || initialCourses);
     } catch (error) {
       console.error("Error fetching admin data:", error);
     } finally {
@@ -232,12 +234,27 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleUpdateSyllabusUrl = (courseId: string, url: string) => {
-    setCourses(prev => prev.map(c => 
-      c.id === courseId ? { ...c, curriculumPdf: url } : c
-    ));
-    setEditingCourseUrl(null);
-    alert("Syllabus URL updated successfully!");
+  const handleUpdateSyllabusUrl = async (courseId: string, url: string) => {
+    try {
+      const res = await fetch("/api/admin/courses", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId, curriculumPdf: url }),
+      });
+
+      if (res.ok) {
+        setCourses(prev => prev.map(c => 
+          c.id === courseId ? { ...c, curriculumPdf: url } : c
+        ));
+        setEditingCourseUrl(null);
+        alert("Syllabus URL updated successfully!");
+      } else {
+        alert("Failed to update syllabus URL");
+      }
+    } catch (error) {
+      console.error("Error updating syllabus URL:", error);
+      alert("An error occurred during update");
+    }
   };
 
   if (dataLoading) {
