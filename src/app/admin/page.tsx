@@ -21,9 +21,12 @@ import {
   Shield,
   UserCheck,
   Home,
-  DollarSign
+  DollarSign,
+  FileText,
+  Upload
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
+import { courses as initialCourses } from "@/lib/courses-data";
 
 export default function AdminDashboardPage() {
   const [flags, setFlags] = useState<any[]>([]);
@@ -31,6 +34,7 @@ export default function AdminDashboardPage() {
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [hostelBookings, setHostelBookings] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>(initialCourses);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
@@ -39,6 +43,7 @@ export default function AdminDashboardPage() {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
   const [announcementData, setAnnouncementData] = useState({ title: "", content: "", module: "GLOBAL" });
   const [creatingAnnouncement, setCreatingAnnouncement] = useState(false);
+  const [uploadingCourseId, setUploadingCourseId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -192,6 +197,37 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleFileUpload = async (courseId: string, file: File) => {
+    if (!file) return;
+    setUploadingCourseId(courseId);
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("courseId", courseId);
+
+    try {
+      const res = await fetch("/api/admin/courses/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCourses(prev => prev.map(c => 
+          c.id === courseId ? { ...c, curriculumPdf: data.path } : c
+        ));
+        alert("Syllabus uploaded successfully!");
+      } else {
+        alert("Failed to upload syllabus");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("An error occurred during upload");
+    } finally {
+      setUploadingCourseId(null);
+    }
+  };
+
   if (dataLoading) {
     return (
       <DashboardLayout>
@@ -204,7 +240,7 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-10 pb-16" data-theme="dashboard">
+      <div className="space-y-8 pb-12 px-4 sm:px-0">
         {selectedBooking && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <motion.div 
@@ -348,49 +384,41 @@ export default function AdminDashboardPage() {
             </motion.div>
           </div>
         )}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight flex items-center">
-              <Shield className="h-10 w-10 mr-4 text-accent-primary" />
-              Admin Control Center
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center">
+              <Shield className="h-6 w-6 sm:h-8 sm:w-8 mr-3 text-accent-primary" />
+              Admin <span className="text-accent-primary ml-2">Control Panel</span>
             </h1>
-            <p className="text-slate-500 font-medium mt-2">Manage users, bookings, and platform features with full authority.</p>
+            <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">System-wide configuration and user management.</p>
           </div>
-          <div className="flex gap-4">
-            <button 
-              onClick={fetchData}
-              className="flex items-center px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all shadow-sm active:scale-95"
-            >
-              Refresh Data
-            </button>
-            <button 
-              onClick={() => setShowAnnouncementModal(true)}
-              className="flex items-center px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-accent-primary transition-all shadow-xl shadow-slate-900/10 active:scale-95"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              New Announcement
-            </button>
-          </div>
+          <button 
+            onClick={() => setShowAnnouncementModal(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+          >
+            <Plus className="h-4 w-4" />
+            New Announcement
+          </button>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <StatCard title="Total Users" count={users.length} icon={Users} color="text-blue-600" bg="bg-blue-50" />
+          <StatCard title="Active Courses" count={courses.length} icon={BookOpen} color="text-purple-600" bg="bg-purple-50" />
           <StatCard title="Hostel Bookings" count={hostelBookings.length} icon={Home} color="text-indigo-600" bg="bg-indigo-50" />
           <StatCard title="Pending Withdrawals" count={withdrawals.length} icon={TrendingUp} color="text-emerald-600" bg="bg-emerald-50" />
-          <StatCard title="Total Referrals" count={referrals.length} icon={Gift} color="text-amber-600" bg="bg-amber-50" />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
           {/* User Management */}
-          <AdminCard title="User Management" icon={Users} badge={`${users.length} Users`}>
+          <AdminCard title="User Access" icon={UserCheck} badge={`${users.length} Users`}>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-100">
+              <table className="min-w-[500px] w-full text-left">
                 <thead>
-                  <tr className="bg-slate-50/50">
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
-                    <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                  <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50">
+                    <th className="px-6 sm:px-8 py-4">User</th>
+                    <th className="px-6 sm:px-8 py-4">Current Role</th>
+                    <th className="px-6 sm:px-8 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -484,9 +512,70 @@ export default function AdminDashboardPage() {
           </AdminCard>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+          {/* Course Curriculum Management */}
+          <AdminCard title="Course Syllabus Management" icon={FileText} badge={`${courses.length} Courses`}>
+            <div className="space-y-6">
+              {courses.map((course) => (
+                <div key={course.id} className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 group hover:border-accent-primary/30 transition-all">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={cn("p-3 rounded-xl bg-white shadow-sm", course.color)}>
+                        <course.icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900">{course.title}</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                          {course.curriculumPdf ? "Syllabus Uploaded" : "No Syllabus Found"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      {course.curriculumPdf && (
+                        <a 
+                          href={course.curriculumPdf} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="p-2.5 bg-white text-slate-400 hover:text-accent-primary rounded-xl border border-slate-200 shadow-sm transition-all"
+                          title="View Current PDF"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                      <label className="relative cursor-pointer">
+                        <input 
+                          type="file" 
+                          accept=".pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(course.id, file);
+                          }}
+                        />
+                        <div className={cn(
+                          "flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs transition-all shadow-sm active:scale-95",
+                          uploadingCourseId === course.id 
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                            : "bg-slate-900 text-white hover:bg-accent-primary"
+                        )}>
+                          {uploadingCourseId === course.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Upload className="w-3.5 h-3.5" />
+                          )}
+                          {course.curriculumPdf ? "Update PDF" : "Upload PDF"}
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AdminCard>
+
           {/* Feature Flags */}
-          <AdminCard title="Module Controls" icon={Flag} className="xl:col-span-1">
+          <AdminCard title="Module Controls" icon={Flag}>
             <div className="divide-y divide-slate-100">
               {["consultancy", "hostel", "courses", "taxi", "jobs", "gaming", "theatre"].map((moduleName) => {
                 const flag = flags.find(f => f.name === moduleName);
@@ -512,9 +601,11 @@ export default function AdminDashboardPage() {
               })}
             </div>
           </AdminCard>
+        </div>
 
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
           {/* Withdrawal Requests */}
-          <AdminCard title="Withdrawals" icon={DollarSign} className="xl:col-span-1" badge={`${withdrawals.length} Pending`}>
+          <AdminCard title="Withdrawals" icon={DollarSign} badge={`${withdrawals.length} Pending`}>
             <div className="divide-y divide-slate-100">
               {withdrawals.length === 0 ? (
                 <div className="py-12 text-center">
@@ -545,7 +636,7 @@ export default function AdminDashboardPage() {
           </AdminCard>
 
           {/* Recent Referrals */}
-          <AdminCard title="Recent Referrals" icon={Gift} className="xl:col-span-1">
+          <AdminCard title="Recent Referrals" icon={Gift}>
             <div className="divide-y divide-slate-100">
               {referrals.slice(0, 6).map((ref) => (
                 <div key={ref.id} className="py-5 group">

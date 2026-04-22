@@ -139,28 +139,28 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 bg-gray-50 relative">
         <motion.div 
           className="w-full max-w-md"
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-center lg:text-left mb-10">
+          <div className="text-center lg:text-left mb-10 px-4">
             <Link href="/" className="lg:hidden inline-flex items-center gap-2 mb-8">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic">U</div>
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic shadow-sm">U</div>
               <span className="text-2xl font-bold text-gray-900 tracking-tight">Upskyla</span>
             </Link>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in</h2>
-            <p className="text-gray-500">
+            <p className="text-gray-500 text-sm sm:text-base">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-primary-600 font-semibold hover:underline">
+              <Link href="/register" className="text-primary-600 font-semibold hover:underline transition-colors">
                 Register here
               </Link>
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <motion.div 

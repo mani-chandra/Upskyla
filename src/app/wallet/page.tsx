@@ -77,48 +77,48 @@ export default function WalletPage() {
 
   return (
     <ModuleLayout moduleName="wallet">
-      <div className="space-y-8 bg-module min-h-full transition-colors duration-300">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4">
-          <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Money & <span className="text-accent-primary">Reward</span></h1>
-            <p className="text-slate-500 font-medium mt-1">Earn ₹750 for every successful hostel referral with full transparency.</p>
+      <div className="space-y-8 bg-module min-h-full transition-colors duration-300 px-4 sm:px-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-4">
+          <div className="text-center lg:text-left">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Money & <span className="text-accent-primary">Reward</span></h1>
+            <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">Earn ₹750 for every successful hostel referral with full transparency.</p>
           </div>
-          <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 group">
-            <div className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary rounded-xl font-mono font-black border border-accent-primary/20 text-lg shadow-sm">
+          <div className="flex items-center justify-between gap-4 bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 group max-w-sm mx-auto lg:mx-0 w-full lg:w-auto">
+            <div className="flex-1 px-4 sm:px-6 py-2 sm:py-2.5 bg-accent-primary/10 text-accent-primary rounded-xl font-mono font-black border border-accent-primary/20 text-base sm:text-lg shadow-sm text-center">
               {status?.referralCode}
             </div>
             <button 
               onClick={copyReferralCode}
-              className="p-3 hover:bg-slate-50 rounded-xl transition-all text-slate-400 hover:text-accent-primary hover:scale-110 active:scale-90"
+              className="p-2.5 sm:p-3 hover:bg-slate-50 rounded-xl transition-all text-slate-400 hover:text-accent-primary hover:scale-110 active:scale-90 shrink-0"
               title="Copy Referral Code"
             >
-              {copied ? <CheckCircle2 className="h-6 w-6 text-emerald-500" /> : <Copy className="h-6 w-6" />}
+              {copied ? <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" /> : <Copy className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
         </div>
 
         {/* Wallet Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           <motion.div 
             whileHover={{ y: -8, scale: 1.02 }}
-            className="bg-accent-primary rounded-[2.5rem] p-10 text-white shadow-2xl shadow-accent-primary/30 relative overflow-hidden group transition-all duration-300"
+            className="bg-primary-600 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 text-white shadow-2xl shadow-primary-200 relative overflow-hidden group transition-all duration-300 md:col-span-2 lg:col-span-1"
           >
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-10">
-                <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/20">
-                  <WalletIcon className="h-8 w-8 text-white" />
+              <div className="flex items-center justify-between mb-8 sm:mb-10">
+                <div className="bg-white/20 p-3 sm:p-4 rounded-2xl backdrop-blur-sm border border-white/20">
+                  <WalletIcon className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-accent-highlight rounded-full border border-white/20 shadow-lg">
-                  <TrendingUp className="h-3.5 w-3.5 text-slate-900" />
-                  <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Active Wallet</span>
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-400 rounded-full border border-white/20 shadow-lg">
+                  <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-900" />
+                  <span className="text-[9px] sm:text-[10px] font-black text-slate-900 uppercase tracking-widest">Active Wallet</span>
                 </div>
               </div>
-              <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-2">Total Balance</p>
-              <h2 className="text-5xl font-black mb-10 tracking-tight">{formatCurrency(balance)}</h2>
+              <p className="text-white/60 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2">Total Balance</p>
+              <h2 className="text-4xl sm:text-5xl font-black mb-8 sm:mb-10 tracking-tight">{formatCurrency(balance)}</h2>
               <button
                 onClick={handleWithdraw}
                 disabled={balance < 750 || withdrawing}
-                className="w-full py-5 bg-white text-accent-primary rounded-[1.5rem] font-black text-sm hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-black/10 hover:shadow-2xl active:scale-95 flex items-center justify-center group/btn"
+                className="w-full py-4 sm:py-5 bg-white text-primary-600 rounded-xl sm:rounded-[1.5rem] font-black text-xs sm:text-sm hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-black/10 hover:shadow-2xl active:scale-95 flex items-center justify-center group/btn"
               >
                 {withdrawing ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                   <>
@@ -129,7 +129,7 @@ export default function WalletPage() {
               </button>
               {balance < 750 && (
                 <div className="mt-4 flex items-center justify-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-accent-highlight animate-pulse" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-yellow-400 animate-pulse" />
                   <p className="text-[10px] text-white/70 font-black uppercase tracking-widest">
                     Min. ₹750 required
                   </p>
@@ -138,64 +138,64 @@ export default function WalletPage() {
             </div>
             {/* Decorative circles */}
             <div className="absolute -bottom-16 -right-16 h-48 w-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors" />
-            <div className="absolute -top-16 -left-16 h-48 w-48 bg-accent-highlight/10 rounded-full blur-3xl" />
+            <div className="absolute -top-16 -left-16 h-48 w-48 bg-white/5 rounded-full blur-3xl" />
           </motion.div>
 
-          <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between group hover:border-accent-primary/20 transition-all duration-300">
+          <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between group hover:border-accent-primary/20 transition-all duration-300">
             <div className="flex items-center justify-between">
-              <div className="p-5 bg-emerald-50 rounded-2xl text-emerald-600 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
-                <TrendingUp className="h-8 w-8" />
+              <div className="p-4 sm:p-5 bg-emerald-50 rounded-2xl text-emerald-600 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg uppercase tracking-widest border border-emerald-100 shadow-sm">
+              <span className="text-[9px] sm:text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 sm:px-3 py-1.5 rounded-lg uppercase tracking-widest border border-emerald-100 shadow-sm">
                 +₹{successfulReferrals * 750}
               </span>
             </div>
-            <div className="mt-8">
-              <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-2">Successful Referrals</p>
-              <h3 className="text-4xl font-black text-slate-900 tracking-tight">{successfulReferrals}</h3>
+            <div className="mt-6 sm:mt-8">
+              <p className="text-slate-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2">Successful Referrals</p>
+              <h3 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">{successfulReferrals}</h3>
             </div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between group hover:border-accent-primary/20 transition-all duration-300">
+          <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between group hover:border-accent-primary/20 transition-all duration-300">
             <div className="flex items-center justify-between">
-              <div className="p-5 bg-amber-50 rounded-2xl text-amber-600 border border-amber-100 group-hover:scale-110 transition-transform duration-300">
-                <Clock className="h-8 w-8" />
+              <div className="p-4 sm:p-5 bg-amber-50 rounded-2xl text-amber-600 border border-amber-100 group-hover:scale-110 transition-transform duration-300">
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg uppercase tracking-widest border border-amber-100 shadow-sm">
+              <span className="text-[9px] sm:text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 sm:px-3 py-1.5 rounded-lg uppercase tracking-widest border border-amber-100 shadow-sm">
                 Potential: ₹{pendingReferrals * 750}
               </span>
             </div>
-            <div className="mt-8">
-              <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-2">Pending Referrals</p>
-              <h3 className="text-4xl font-black text-slate-900 tracking-tight">{pendingReferrals}</h3>
+            <div className="mt-6 sm:mt-8">
+              <p className="text-slate-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2">Pending Referrals</p>
+              <h3 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">{pendingReferrals}</h3>
             </div>
           </div>
         </div>
 
         {/* Referrals Table */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden pb-8">
-          <div className="px-10 py-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="font-black text-slate-900 text-lg uppercase tracking-tight flex items-center">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden pb-8">
+          <div className="px-6 sm:px-10 py-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h2 className="font-black text-slate-900 text-base sm:text-lg uppercase tracking-tight flex items-center">
               <Users className="h-5 w-5 mr-3 text-accent-primary" />
               Referral History
             </h2>
-            <div className="flex items-center gap-6">
-              <span className="flex items-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <span className="flex items-center text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest">
                 <div className="h-2 w-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Credited
               </span>
-              <span className="flex items-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <span className="flex items-center text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest">
                 <div className="h-2 w-2 rounded-full bg-amber-500 mr-2 shadow-[0_0_8px_rgba(245,158,11,0.5)]" /> Pending
               </span>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="min-w-[600px] w-full text-left">
               <thead>
-                <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50/30 border-b border-slate-50">
-                  <th className="px-10 py-5">Student</th>
-                  <th className="px-10 py-5">Status</th>
-                  <th className="px-10 py-5">Reward</th>
-                  <th className="px-10 py-5">Date</th>
+                <tr className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50/30 border-b border-slate-50">
+                  <th className="px-6 sm:px-10 py-5">Student</th>
+                  <th className="px-6 sm:px-10 py-5">Status</th>
+                  <th className="px-6 sm:px-10 py-5">Reward</th>
+                  <th className="px-6 sm:px-10 py-5">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">

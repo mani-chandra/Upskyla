@@ -1,153 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, GraduationCap, Hotel, Car, BookOpen } from "lucide-react";
-import { motion, Variants } from "framer-motion";
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
-const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.5, ease: "easeOut" as const }
-  }
-};
-
-const floatVariants: Variants = {
-  initial: { y: 0 },
-  animate: {
-    y: [0, -10, 0],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: "easeInOut" as const
-    }
-  }
-};
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function Hero() {
   return (
-    <section className="relative py-20 overflow-hidden bg-white">
-      <div className="container px-4 mx-auto">
-        <div className="flex flex-wrap items-center -mx-4">
-          <motion.div 
-            className="w-full px-4 mb-16 lg:w-1/2 lg:mb-0"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <motion.span 
-              variants={itemVariants}
-              className="inline-block py-1 px-3 mb-4 text-xs font-semibold text-primary-600 bg-primary-50 rounded-full uppercase tracking-widest"
+    <section className="relative pt-24 pb-20 bg-white">
+      <div className="container px-4 mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl mx-auto"
+        >
+          <span className="inline-flex items-center px-4 py-1.5 mb-8 text-sm font-medium text-primary-700 bg-primary-50 rounded-full border border-primary-100">
+            Now open for 2026 academic session
+          </span>
+          <h1 className="mb-8 text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] sm:leading-[1.05]">
+            Everything you need for <br className="hidden sm:block" />
+            <span className="text-primary-600">successful student life.</span>
+          </h1>
+          <p className="mb-10 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
+            Upskyla is the unified ecosystem for student living, learning, and career growth. Manage your hostel, courses, and jobs—all from one place.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 sm:mb-20 px-4 sm:px-0">
+            <Link
+              href="/register"
+              className="w-full sm:w-auto px-8 py-4 font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200"
             >
-              The All-in-One Student Hub
-            </motion.span>
-            <motion.h1 
-              variants={itemVariants}
-              className="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-gray-900 leading-tight"
+              Get Started for Free
+            </Link>
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-8 py-4 font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
             >
-              Empowering Students <span className="text-primary-600">Beyond Education.</span>
-            </motion.h1>
-            <motion.p 
-              variants={itemVariants}
-              className="mb-8 text-lg md:text-xl text-gray-500 leading-relaxed max-w-xl"
-            >
-              A unified ecosystem for admissions, student living, mobility, career growth, and skill development — all in one platform.
-            </motion.p>
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
-              <Link
-                href="/register"
-                className="group inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 transform hover:-translate-y-1 shadow-lg shadow-primary-200"
-              >
-                Register Now
-                <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center px-8 py-4 font-bold text-gray-900 transition-all bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transform hover:-translate-y-1"
-              >
-                Login
-              </Link>
-            </motion.div>
-          </motion.div>
-          
-          <div className="w-full px-4 lg:w-1/2">
-            <div className="relative max-w-lg mx-auto lg:max-w-none">
-              <motion.div 
-                className="absolute top-0 left-0 w-full h-full bg-primary-100 rounded-3xl transform translate-x-4 translate-y-4 -z-10"
-                animate={{ 
-                  scale: [1, 1.02, 1],
-                  rotate: [0, 1, 0]
-                }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" as const }}
+              Login to Dashboard
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Professional Mockup Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative max-w-6xl mx-auto"
+        >
+          <div className="relative rounded-2xl overflow-hidden border border-gray-200 shadow-2xl bg-gray-50 p-2">
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+              <img 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop" 
+                alt="Upskyla Platform Dashboard" 
+                className="w-full h-auto object-cover"
               />
-              <div className="grid grid-cols-2 gap-4">
-                <motion.div 
-                  className="p-6 bg-white rounded-2xl shadow-lg transform translate-y-8 border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
-                  variants={floatVariants}
-                  initial="initial"
-                  animate="animate"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-blue-600 bg-blue-50 rounded-xl">
-                    <GraduationCap className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">Admissions</h3>
-                  <p className="text-sm text-gray-500">Expert guidance & prep.</p>
-                </motion.div>
-                <motion.div 
-                  className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
-                  initial={{ y: 0 }}
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-indigo-600 bg-indigo-50 rounded-xl">
-                    <Hotel className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">Living</h3>
-                  <p className="text-sm text-gray-500">Smart hostel management.</p>
-                </motion.div>
-                <motion.div 
-                  className="p-6 bg-white rounded-2xl shadow-lg transform translate-y-8 border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
-                  initial={{ y: 0 }}
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" as const, delay: 0.5 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-orange-600 bg-orange-50 rounded-xl">
-                    <Car className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">Mobility</h3>
-                  <p className="text-sm text-gray-500">Safe student transport.</p>
-                </motion.div>
-                <motion.div 
-                  className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:border-primary-200 hover:shadow-xl transition-all"
-                  initial={{ y: 0 }}
-                  animate={{ y: [0, 12, 0] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" as const, delay: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-green-600 bg-green-50 rounded-xl">
-                    <BookOpen className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">Courses</h3>
-                  <p className="text-sm text-gray-500">Industry-ready skills.</p>
-                </motion.div>
-              </div>
             </div>
           </div>
-        </div>
+          
+          {/* Subtle Accent Decorations */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-100 rounded-full blur-3xl opacity-50 -z-10" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-50 -z-10" />
+        </motion.div>
       </div>
     </section>
   );

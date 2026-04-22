@@ -8,6 +8,8 @@ interface DashboardContextType {
   loading: boolean;
   moduleTheme: string;
   setModuleTheme: (theme: string) => void;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (isOpen: boolean) => void;
   refreshUser: () => Promise<void>;
 }
 
@@ -18,6 +20,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [flags, setFlags] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [moduleTheme, setModuleTheme] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -65,6 +68,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       loading, 
       moduleTheme, 
       setModuleTheme, 
+      isSidebarOpen,
+      setIsSidebarOpen,
       refreshUser: fetchData 
     }}>
       {children}

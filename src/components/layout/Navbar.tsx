@@ -1,12 +1,12 @@
 "use client";
 
-import { Bell, Search, User, X } from "lucide-react";
+import { Bell, Search, User, X, Menu } from "lucide-react";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
-  const { user, moduleTheme } = useDashboard();
+  const { user, moduleTheme, setIsSidebarOpen } = useDashboard();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -18,9 +18,15 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="h-16 bg-base-navy border-b border-slate-800 px-8 flex items-center justify-between text-slate-300 transition-colors duration-300 relative">
+    <header className="h-16 bg-base-navy border-b border-slate-800 px-4 md:px-8 flex items-center justify-between text-slate-300 transition-colors duration-300 sticky top-0 z-30">
       <div className="flex items-center flex-1">
-        <div className="relative w-96">
+        <button 
+          onClick={() => setIsSidebarOpen?.(true)}
+          className="p-2 -ml-2 text-slate-400 hover:text-white rounded-lg lg:hidden mr-2"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <div className="relative w-64 lg:w-96 hidden md:block">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-500" />
           </span>
@@ -32,7 +38,7 @@ export function Navbar() {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 md:space-x-4">
         <div className="relative">
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
@@ -89,9 +95,9 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center space-x-3 border-l pl-4 border-slate-800">
-          <div className="text-right hidden sm:block">
+          <div className="text-right hidden lg:block">
             <p className="text-sm font-medium text-white">{user?.name || "Student"}</p>
-            <p className="text-xs text-slate-400 capitalize">{user?.role?.toLowerCase()}</p>
+            <p className="text-xs text-slate-400 capitalize">{user?.role?.toLowerCase() || "Free Plan"}</p>
           </div>
           <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary font-bold border border-slate-700 transition-colors duration-300">
             {user?.name?.[0]?.toUpperCase() || <User className="h-6 w-6" />}

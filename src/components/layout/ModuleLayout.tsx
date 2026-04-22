@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { AlertCircle } from "lucide-react";
 import { useDashboard } from "@/lib/context/DashboardContext";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function ModuleLayout({ 
   children, 
@@ -26,6 +28,8 @@ function ModuleContent({ children, moduleName }: { children: React.ReactNode, mo
   useEffect(() => {
     // Set the theme for this module
     setModuleTheme(moduleName);
+    // Cleanup: Reset theme when leaving module
+    return () => setModuleTheme("dashboard");
   }, [moduleName, setModuleTheme]);
 
   useEffect(() => {
@@ -66,5 +70,20 @@ function ModuleContent({ children, moduleName }: { children: React.ReactNode, mo
     );
   }
 
-  return <>{children}</>;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="relative"
+    >
+      {/* Module Glow Effect */}
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-[var(--accent-primary)] opacity-[0.03] blur-[120px] pointer-events-none rounded-full" />
+      
+      {/* Content Wrapper */}
+      <div className="relative z-10 space-y-12">
+        {children}
+      </div>
+    </motion.div>
+  );
 }

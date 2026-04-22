@@ -11,10 +11,11 @@ import {
   Briefcase, 
   ShieldCheck,
   LogOut,
-  Wallet
+  Wallet,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import { useDashboard } from "@/lib/context/DashboardContext";
 
 const sidebarItems = [
@@ -41,7 +42,7 @@ const itemVariants: Variants = {
 };
 
 export function Sidebar() {
-  const { user, flags, moduleTheme } = useDashboard();
+  const { user, flags, moduleTheme, isSidebarOpen, setIsSidebarOpen } = useDashboard();
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -50,104 +51,132 @@ export function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-base-navy border-r border-slate-800 w-64 z-20 text-slate-300 transition-colors duration-300">
-      <div className="p-6">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-accent-primary rounded-lg flex items-center justify-center text-white font-bold italic shrink-0 transition-colors duration-300">U</div>
-          <h1 className="text-xl font-bold text-white tracking-tight">
-            Upskyla
-          </h1>
-        </div>
-      </div>
-      
-      <nav className="flex-1 px-4 space-y-1">
-        {sidebarItems.map((item, idx) => {
-          const flag = flags.find(f => f.name === item.flag);
-          const isDisabled = item.flag && flag && !flag.isEnabled;
-          const isActive = pathname.startsWith(item.href);
+    <>
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-          return (
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-50 flex flex-col h-full bg-white border-r border-gray-100 w-64 text-gray-600 transition-transform duration-300 lg:static lg:translate-x-0",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold italic shrink-0">U</div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+              Upskyla
+            </h1>
+          </div>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden p-2 text-gray-400 hover:text-gray-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          {sidebarItems.map((item, idx) => {
+            const flag = flags.find(f => f.name === item.flag);
+            const isDisabled = item.flag && flag && !flag.isEnabled;
+            const isActive = pathname.startsWith(item.href);
+
+            return (
+              <motion.div
+                key={item.name}
+                custom={idx}
+                initial="hidden"
+                animate="visible"
+                variants={itemVariants}
+                whileHover={{ x: 4 }}
+              >
+                <Link
+                  href={isDisabled ? "#" : item.href}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-3 text-sm font-semibold rounded-2xl transition-all group relative",
+                    isActive
+                      ? "bg-[var(--accent-highlight)] text-[var(--accent-primary)] shadow-sm"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
+                    isDisabled && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <item.icon className={cn(
+                    "mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
+                    isActive ? "text-[var(--accent-primary)]" : "text-gray-400 group-hover:text-gray-600"
+                  )} />
+                  {item.name}
+                  {isDisabled && (
+                    <span className="ml-auto bg-gray-100 text-gray-400 text-[10px] px-1.5 py-0.5 rounded">
+                      Soon
+                    </span>
+                  )}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="sidebar-pill"
+                      className="absolute left-0 w-1.5 h-6 bg-[var(--accent-primary)] rounded-r-full"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              </motion.div>
+            );
+          })}
+
+          {user?.role === "ADMIN" && (
             <motion.div
-              key={item.name}
-              custom={idx}
+              custom={sidebarItems.length}
               initial="hidden"
               animate="visible"
               variants={itemVariants}
+              whileHover={{ x: 4 }}
             >
               <Link
-                href={isDisabled ? "#" : item.href}
+                href="/admin"
+                onClick={() => setIsSidebarOpen(false)}
                 className={cn(
-                  "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all group relative",
-                  isActive
-                    ? "bg-slate-800/50 text-accent-primary shadow-sm"
-                    : "text-slate-400 hover:bg-slate-800/30 hover:text-white",
-                  isDisabled && "opacity-50 cursor-not-allowed"
+                  "flex items-center px-4 py-3 text-sm font-semibold rounded-2xl transition-all group relative",
+                  pathname.startsWith("/admin")
+                    ? "bg-[var(--accent-highlight)] text-[var(--accent-primary)] shadow-sm"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
-                <item.icon className={cn(
+                <ShieldCheck className={cn(
                   "mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
-                  isActive ? "text-accent-primary" : "text-slate-500 group-hover:text-slate-300"
+                  pathname.startsWith("/admin") ? "text-[var(--accent-primary)]" : "text-gray-400 group-hover:text-gray-600"
                 )} />
-                {item.name}
-                {isDisabled && (
-                  <span className="ml-auto bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded">
-                    Soon
-                  </span>
-                )}
-                {isActive && (
+                Admin Panel
+                {pathname.startsWith("/admin") && (
                   <motion.div 
                     layoutId="sidebar-pill"
-                    className="absolute left-0 w-1 h-6 bg-accent-primary rounded-r-full"
+                    className="absolute left-0 w-1.5 h-6 bg-[var(--accent-primary)] rounded-r-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
               </Link>
             </motion.div>
-          );
-        })}
+          )}
+        </nav>
 
-        {user?.role === "ADMIN" && (
-          <motion.div
-            custom={sidebarItems.length}
-            initial="hidden"
-            animate="visible"
-            variants={itemVariants}
+        <div className="p-4 border-t border-gray-100">
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-500 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all group"
           >
-            <Link
-              href="/admin"
-              className={cn(
-                "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all group relative",
-                pathname.startsWith("/admin")
-                  ? "bg-slate-800/50 text-accent-primary shadow-sm"
-                  : "text-slate-400 hover:bg-slate-800/30 hover:text-white"
-              )}
-            >
-              <ShieldCheck className={cn(
-                "mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
-                pathname.startsWith("/admin") ? "text-accent-primary" : "text-slate-500 group-hover:text-slate-300"
-              )} />
-              Admin Panel
-              {pathname.startsWith("/admin") && (
-                <motion.div 
-                  layoutId="sidebar-pill"
-                  className="absolute left-0 w-1 h-6 bg-accent-primary rounded-r-full"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-            </Link>
-          </motion.div>
-        )}
-      </nav>
-
-      <div className="p-4 border-t border-slate-800">
-        <button
-          onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all group"
-        >
-          <LogOut className="mr-3 h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
-          Logout
-        </button>
+            <LogOut className="mr-3 h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
+            Logout
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -173,7 +173,7 @@ function HostelContent() {
   const isCouponApplied = true; 
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto pb-12 transition-colors duration-300">
+    <div className="space-y-12 max-w-7xl mx-auto pb-12 transition-colors duration-300 px-4 sm:px-0">
       {showReceipt && receiptData && (
         <ReceiptModal 
           {...receiptData} 
@@ -183,30 +183,30 @@ function HostelContent() {
       {!hasBooking ? (
         <>
           {/* Header & Introduction */}
-          <div className="text-center space-y-6 max-w-4xl mx-auto pt-8">
+          <div className="text-center space-y-6 max-w-4xl mx-auto pt-4 md:pt-12">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center px-5 py-2 rounded-full bg-accent-primary/10 text-accent-primary text-sm font-black border border-accent-primary/20 shadow-sm uppercase tracking-wider transition-colors duration-300"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center px-6 py-2 rounded-full bg-white shadow-xl shadow-gray-200/50 text-[var(--accent-primary)] text-xs md:text-sm font-bold border border-gray-100 uppercase tracking-widest transition-all"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Welcome to Upskyla Living
+              Elevated Student Living
             </motion.div>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight"
+              className="text-4xl sm:text-6xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1]"
             >
-              Safety, Comfort & <span className="text-accent-primary transition-colors duration-300">Community</span>
+              Premium <span className="text-[var(--accent-primary)]">Hostel</span> Ecosystem
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto"
+              className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto"
             >
-              Experience a warm, welcoming home away from home. Upskyla provides premium student living with a focus on comfort and connection.
+              Discover a living experience that combines modern comfort with advanced automation. Manage your entire stay from your phone.
             </motion.p>
           </div>
 

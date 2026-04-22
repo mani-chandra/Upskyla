@@ -97,16 +97,16 @@ export default function DashboardPage() {
   }, [setModuleTheme]);
 
   return (
-    <div className="space-y-8 bg-module min-h-full transition-colors duration-300">
+    <div className="space-y-8 bg-module min-h-full transition-colors duration-300 px-4 sm:px-0">
       <motion.div 
         className="space-y-8"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        <motion.div variants={itemVariants}>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back!</h1>
-          <p className="text-slate-500 mt-1">Here&apos;s what&apos;s happening with your student account today.</p>
+        <motion.div variants={itemVariants} className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Welcome back!</h1>
+          <p className="text-slate-500 mt-1 text-sm sm:text-base">Here&apos;s what&apos;s happening with your student account today.</p>
         </motion.div>
 
         {/* Announcements Section */}
@@ -114,24 +114,24 @@ export default function DashboardPage() {
           variants={itemVariants}
           className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
         >
-          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Latest Announcements</h2>
-            <Link href="/announcements" className="text-sm text-accent-primary hover:text-accent-secondary font-medium transition-colors">View all</Link>
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900 text-sm sm:text-base">Latest Announcements</h2>
+            <Link href="/announcements" className="text-xs sm:text-sm text-accent-primary hover:text-accent-secondary font-medium transition-colors">View all</Link>
           </div>
           <div className="divide-y divide-slate-100">
             {announcements.map((ann, i) => (
               <motion.div 
                 key={ann.id} 
-                className="px-6 py-4 hover:bg-slate-50 transition-colors"
+                className="px-4 sm:px-6 py-4 hover:bg-slate-50 transition-colors"
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-sm font-medium text-slate-900">{ann.title}</h3>
-                    <p className="mt-1 text-sm text-slate-500 leading-relaxed">{ann.content}</p>
+                    <h3 className="text-xs sm:text-sm font-medium text-slate-900">{ann.title}</h3>
+                    <p className="mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed line-clamp-2 sm:line-clamp-none">{ann.content}</p>
                   </div>
-                  <span className="text-xs text-slate-400 font-medium whitespace-nowrap">{ann.date}</span>
+                  <span className="text-[10px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">{ann.date}</span>
                 </div>
               </motion.div>
             ))}
@@ -139,7 +139,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((module) => {
             const flag = flags.find(f => f.name === module.flag);
             const isDisabled = module.flag && flag && !flag.isEnabled;
@@ -148,32 +148,51 @@ export default function DashboardPage() {
               <motion.div
                 key={module.name}
                 variants={itemVariants}
-                whileHover={isDisabled ? {} : { y: -5, scale: 1.02 }}
+                whileHover={isDisabled ? {} : { y: -10, scale: 1.02 }}
                 whileTap={isDisabled ? {} : { scale: 0.98 }}
               >
                 <Link
                   href={isDisabled ? "#" : module.href}
                   className={cn(
-                    "group relative block h-full bg-white rounded-xl shadow-sm border border-slate-200 p-6 transition-all hover:shadow-md hover:border-accent-primary/20",
+                    "group relative block h-full module-card p-6 md:p-8 overflow-hidden",
                     isDisabled && "opacity-75 cursor-not-allowed"
                   )}
                 >
-                  <div className={cn("inline-flex p-3 rounded-xl mb-4 transition-all group-hover:rotate-12 group-hover:scale-110", module.bg, module.color)}>
-                    <module.icon className="h-6 w-6" />
+                  {/* Subtle Background Icon Decoration */}
+                  <module.icon className="absolute -right-8 -bottom-8 w-32 h-32 text-gray-50 opacity-[0.03] group-hover:scale-110 transition-transform duration-700" />
+                  
+                  <div className={cn(
+                    "inline-flex p-4 rounded-2xl mb-6 transition-all duration-500 group-hover:rotate-[15deg] group-hover:scale-110 shadow-lg", 
+                    module.bg, 
+                    module.color,
+                    "group-hover:shadow-xl"
+                  )}>
+                    <module.icon className="h-6 w-6 md:h-7 md:w-7" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center group-hover:text-accent-primary transition-colors">
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center group-hover:text-primary-600 transition-colors">
                     {module.name}
-                    {!isDisabled && <ArrowRight className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all" />}
+                    {!isDisabled && (
+                      <motion.div
+                        initial={{ x: -10, opacity: 0 }}
+                        whileHover={{ x: 0, opacity: 1 }}
+                        className="ml-2"
+                      >
+                        <ArrowRight className="h-5 w-5 text-primary-600" />
+                      </motion.div>
+                    )}
                   </h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{module.description}</p>
+                  
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium mb-4">{module.description}</p>
                   
                   {isDisabled && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm">
-                        Launching Soon
-                      </span>
+                    <div className="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-bold rounded-full uppercase tracking-wider border border-amber-100">
+                      Coming Soon
                     </div>
                   )}
+                  
+                  {/* Bottom Accent Line */}
+                  <div className={cn("absolute bottom-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent w-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500", module.color.replace('text-', 'bg-'))} />
                 </Link>
               </motion.div>
             );
@@ -181,13 +200,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Stats/Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
           <motion.div 
             variants={itemVariants}
-            className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+            className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-6"
           >
-            <h2 className="font-semibold text-slate-900 mb-6 flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-accent-primary" />
+            <h2 className="font-semibold text-slate-900 mb-6 flex items-center text-sm sm:text-base">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-accent-primary" />
               Recent Activity
             </h2>
             <div className="space-y-6">
@@ -197,7 +216,7 @@ export default function DashboardPage() {
               ].map((activity, i) => (
                 <motion.div 
                   key={i} 
-                  className="flex items-center text-sm"
+                  className="flex items-center text-xs sm:text-sm"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + i * 0.1 }}

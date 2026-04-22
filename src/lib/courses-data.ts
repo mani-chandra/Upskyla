@@ -47,6 +47,8 @@ export interface Course {
   };
   price: number;
   faq: { q: string; a: string }[];
+  image: string;
+  curriculumPdf?: string;
 }
 
 export const courses: Course[] = [
@@ -59,6 +61,8 @@ export const courses: Course[] = [
     icon: Code2,
     color: "text-blue-600",
     bg: "bg-blue-50",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop",
+    curriculumPdf: "/docs/curriculum/full-stack-web.pdf",
     duration: "4 Months",
     totalHours: 96,
     format: "Weekend Only (Sat & Sun) - Live Online",
@@ -103,6 +107,8 @@ export const courses: Course[] = [
     icon: BrainCircuit,
     color: "text-purple-600",
     bg: "bg-purple-50",
+    image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2070&auto=format&fit=crop",
+    curriculumPdf: "/docs/curriculum/ai-ml.pdf",
     duration: "4 Months",
     totalHours: 96,
     format: "Weekend Only (Sat & Sun) - Live Online",
@@ -144,6 +150,8 @@ export const courses: Course[] = [
     icon: ShieldAlert,
     color: "text-red-600",
     bg: "bg-red-50",
+    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
+    curriculumPdf: "/docs/curriculum/cyber-security.pdf",
     duration: "4 Months",
     totalHours: 96,
     format: "Weekend Only (Sat & Sun) - Live Online",
@@ -185,6 +193,8 @@ export const courses: Course[] = [
     icon: CloudCog,
     color: "text-emerald-600",
     bg: "bg-emerald-50",
+    image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?q=80&w=2070&auto=format&fit=crop",
+    curriculumPdf: "/docs/curriculum/devops.pdf",
     duration: "4 Months",
     totalHours: 96,
     format: "Weekend Only (Sat & Sun) - Live Online",
@@ -198,23 +208,23 @@ export const courses: Course[] = [
       { title: "CI/CD Pipelines", hours: 15, topics: ["Jenkins/GitHub Actions", "Build Automation", "Testing in Pipeline"] },
       { title: "Infrastructure as Code", hours: 10, topics: ["Terraform Basics", "Ansible Configuration", "Provisioning"] },
       { title: "Orchestration (Kubernetes)", hours: 15, topics: ["K8s Clusters", "Pods, Services, Deployments", "Helm Charts"] },
-      { title: "Monitoring & Logging", hours: 6, topics: ["Prometheus", "Grafana Dashboards", "Log Management"] }
+      { title: "Monitoring & Logging", hours: 6, topics: ["Prometheus/Grafana", "ELK Stack Basics", "Site Reliability"] }
     ],
     capstone: {
-      description: "Design and implement a fully automated CI/CD pipeline for a scalable microservices application on the cloud.",
-      requirements: ["AWS Infrastructure", "Dockerized Apps", "Automated Pipeline", "Monitoring Setup"],
+      description: "Design and implement a highly available, automated deployment pipeline for a multi-service application on a public cloud platform.",
+      requirements: ["Full CI/CD Pipeline", "Container Orchestration", "Infrastructure as Code", "Monitoring Setup"],
       timeline: [
-        { week: "Week 8", task: "Project Architecture Design" },
-        { week: "Week 10", task: "Infrastructure Provisioning (IaC)" },
-        { week: "Week 12", task: "CI/CD Pipeline Setup" },
-        { week: "Week 14", task: "Orchestration & Scaling" },
-        { week: "Week 16", task: "Monitoring & Final Presentation" }
+        { week: "Week 8", task: "Architecture & Tooling Strategy" },
+        { week: "Week 10", task: "Base Infrastructure Setup (IaC)" },
+        { week: "Week 12", task: "CI/CD & Containerization" },
+        { week: "Week 14", task: "Scale & Reliability Testing" },
+        { week: "Week 16", task: "Final Demo & Handover" }
       ]
     },
-    price: 31999,
+    price: 32999,
     faq: [
-      { q: "Which cloud provider do we use?", a: "We primarily focus on AWS, as it is the industry leader." },
-      { q: "Is coding required for DevOps?", a: "Basic understanding of scripting (Python/Bash) is very helpful." }
+      { q: "Is AWS certification included?", a: "The course prepares you for AWS Solutions Architect Associate, but exam fees are separate." },
+      { q: "Do I need to be a developer?", a: "Basic coding knowledge is helpful, but we focus on scripting and automation." }
     ]
   }
 ];

@@ -18,9 +18,10 @@ import {
   GraduationCap,
   Sparkles,
   HelpCircle,
-  Code2
+  Code2,
+  FileDown
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import Link from "next/link";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useState } from "react";
@@ -128,8 +129,8 @@ export default function CourseDetailPage() {
         )}
         
         {/* Hero Section */}
-        <section className="relative pt-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
+        <section className="relative pt-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="space-y-8 sticky top-24">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -143,7 +144,7 @@ export default function CourseDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight"
+              className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-[1.1]"
             >
               {course.title}
             </motion.h1>
@@ -152,15 +153,37 @@ export default function CourseDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-slate-500 font-medium leading-relaxed"
+              className="text-xl text-slate-500 font-medium leading-relaxed"
             >
               {course.longDescription}
             </motion.p>
 
+            {/* Course Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl shadow-slate-200 group"
+            >
+              <img 
+                src={course.image} 
+                alt={course.title} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className={cn(
+                "absolute bottom-6 left-6 p-4 rounded-2xl shadow-2xl backdrop-blur-md border border-white/20",
+                course.bg.replace('bg-', 'bg-white/90 '),
+                course.color
+              )}>
+                <course.icon className="w-8 h-8" />
+              </div>
+            </motion.div>
+
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4 }}
               className="grid grid-cols-2 gap-6 pt-4"
             >
               <div className="flex items-center gap-4">
@@ -224,11 +247,23 @@ export default function CourseDetailPage() {
 
         {/* Curriculum Section */}
         <section className="space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase">Master the Curriculum</h2>
-            <p className="text-slate-500 font-medium max-w-2xl mx-auto">
-              A meticulously structured 96-hour roadmap designed for depth and practical mastery.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-4 text-center md:text-left">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase">Master the Curriculum</h2>
+              <p className="text-slate-500 font-medium max-w-2xl">
+                A meticulously structured 96-hour roadmap designed for depth and practical mastery.
+              </p>
+            </div>
+            {course.curriculumPdf && (
+              <a 
+                href={course.curriculumPdf}
+                download
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-black text-sm border border-slate-200 shadow-xl shadow-slate-200/50 hover:bg-slate-50 transition-all active:scale-95 shrink-0"
+              >
+                <FileDown className="w-4 h-4 text-accent-primary" />
+                Download Syllabus PDF
+              </a>
+            )}
           </div>
 
           <div className="max-w-4xl mx-auto">
