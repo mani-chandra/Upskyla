@@ -33,17 +33,6 @@ export function CourseCard({ course, idx }: CourseCardProps) {
             <Video className="w-3 h-3" />
             Watch Preview
           </div>
-          {course.curriculumPdf && (
-            <a 
-              href={course.curriculumPdf}
-              download
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-white hover:bg-white/40 transition-colors transform translate-y-4 group-hover:translate-y-0 transition-transform delay-75"
-              title="Download Syllabus"
-            >
-              <FileDown className="w-4 h-4" />
-            </a>
-          )}
         </div>
 
         {/* Floating Icon */}
@@ -117,14 +106,28 @@ export function CourseCard({ course, idx }: CourseCardProps) {
         </div>
 
         {/* Actions */}
-        <div className="pt-6">
+        <div className="pt-6 flex gap-3">
           <Link 
             href={`/courses/${course.slug}`}
-            className="w-full py-4 bg-slate-900 text-white rounded-xl md:rounded-2xl font-black text-sm hover:bg-primary-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center group/btn"
+            className="flex-grow py-4 bg-slate-900 text-white rounded-xl md:rounded-2xl font-black text-sm hover:bg-primary-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center group/btn"
           >
             Explore Curriculum
             <ArrowRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
           </Link>
+          {course.curriculumPdf ? (
+            <a 
+              href={course.curriculumPdf}
+              download
+              className="p-4 bg-slate-100 text-slate-600 rounded-xl md:rounded-2xl hover:bg-primary-50 hover:text-primary-600 transition-all active:scale-95 flex items-center justify-center"
+              title="Download Syllabus"
+            >
+              <FileDown className="w-5 h-5" />
+            </a>
+          ) : (
+            <div className="p-4 bg-slate-50 text-slate-300 rounded-xl md:rounded-2xl flex items-center justify-center cursor-not-allowed" title="No Syllabus Uploaded">
+              <FileDown className="w-5 h-5" />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

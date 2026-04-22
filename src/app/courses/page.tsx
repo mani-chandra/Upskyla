@@ -21,7 +21,7 @@ export default function CoursesPage() {
           const data = await res.json();
           // Merge with initialCourses to preserve icon components and other non-serializable data
           const mergedData = initialCourses.map(initialCourse => {
-            const fetchedCourse = data.find((c: any) => c.id === initialCourse.id);
+            const fetchedCourse = (data as any[]).find((c: any) => c.id === initialCourse.id);
             if (fetchedCourse) {
               return {
                 ...initialCourse,

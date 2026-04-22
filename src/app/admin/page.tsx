@@ -70,9 +70,11 @@ export default function AdminDashboardPage() {
       setUsers(usersData || []);
       setHostelBookings(hostelData || []);
 
+      const data = coursesData;
+
       // Merge with initialCourses to preserve icon components
       const mergedCourses = initialCourses.map(initialCourse => {
-        const fetchedCourse = (coursesData || []).find((c: any) => c.id === initialCourse.id);
+        const fetchedCourse = (data as any[]).find((c: any) => c.id === initialCourse.id);
         if (fetchedCourse) {
           return {
             ...initialCourse,

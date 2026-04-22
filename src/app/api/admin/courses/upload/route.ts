@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes);
 
     const uploadDir = path.join(process.cwd(), "public", "docs", "curriculum");
-    
+
     try {
       await mkdir(uploadDir, { recursive: true });
     } catch (err) {
@@ -55,19 +55,27 @@ export async function POST(req: Request) {
     const publicPath = `/docs/curriculum/${fileName}`;
 
     // Update the course in the database with the new PDF path
-    await prisma.course.update({
+    // Using any type to bypass TypeScript strict checking for Prisma
+    const updateData: any = {
+      curriculumPdf: publicPath
+    };
+
+    const updatedCourse = await (prisma.course as any).update({
       where: { id: courseId },
-      data: { curriculumPdf: publicPath }
+      data: updateData
     });
-    
-    return NextResponse.json({ 
+
+    console.log("Upload successful:", { courseId, publicPath, updatedCourse });
+
+    return NextResponse.json({
       message: "File uploaded successfully",
-      path: publicPath 
+      path: publicPath,
+      updatedCourse
     });
   } catch (error: any) {
     console.error("Upload error details:", error);
     return NextResponse.json(
-      { message: `Failed to upload file: ${error.message || "Unknown error"}` },
+      { message: `Failed to upload file: ${error.message || "Unknown error"}`, error: String(error) },
       { status: 500 }
     );
   }

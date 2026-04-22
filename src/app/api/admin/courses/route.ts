@@ -12,9 +12,14 @@ export async function PATCH(req: Request) {
       );
     }
 
-    await prisma.$executeRaw`UPDATE "Course" SET "curriculumPdf" = ${curriculumPdf || null} WHERE "id" = ${courseId}`;
+    const updateData: any = {
+      curriculumPdf: curriculumPdf || null
+    };
 
-    const updatedCourse = await prisma.course.findUnique({ where: { id: courseId } });
+    const updatedCourse = await (prisma.course as any).update({
+      where: { id: courseId },
+      data: updateData
+    });
 
     return NextResponse.json(updatedCourse);
   } catch (error: any) {
