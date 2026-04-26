@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { amount, currency = "INR" } = await req.json();
+    const { amount, currency = "INR", type = "OTHER" } = await req.json();
 
     const options = {
       amount: amount * 100, // Razorpay works in paise
@@ -32,6 +32,8 @@ export async function POST(req: Request) {
         currency,
         providerId: order.id,
         status: "created",
+        type: type,
+        userId: session.user.id,
       },
     });
 
@@ -44,3 +46,6 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
+// A49, A50, A45, A03

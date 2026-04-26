@@ -33,10 +33,9 @@ model ConsultationBooking {
   date      DateTime
   status    BookingStatus @default(PENDING)
   notes     String?
-  paymentId String?       @unique
   createdAt DateTime      @default(now())
-  payment   Payment?      @relation(fields: [paymentId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
+  payment   Payment?
 }
 
 model Coupon {
@@ -68,11 +67,10 @@ model Enrollment {
   courseId   String
   progress   Int      @default(0)
   completed  Boolean  @default(false)
-  paymentId  String?  @unique
   enrolledAt DateTime @default(now())
   course     Course   @relation(fields: [courseId], references: [id])
-  payment    Payment? @relation(fields: [paymentId], references: [id])
   user       User     @relation(fields: [userId], references: [id])
+  payment    Payment?
 }
 
 model Exam {
@@ -115,40 +113,43 @@ model GamingBooking {
 }
 
 model HostelBooking {
-  id            String        @id @default(cuid())
-  userId        String        @unique
-  roomNumber    String
-  status        BookingStatus @default(PENDING)
-  checkIn       DateTime
-  checkOut      DateTime?
-  paymentId     String?       @unique
-  isCheckedIn   Boolean       @default(false)
-  firstRentPaid Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  payment       Payment?      @relation(fields: [paymentId], references: [id])
-  user          User          @relation(fields: [userId], references: [id])
+  id             String        @id @default(cuid())
+  userId         String        @unique
+  roomNumber     String?
+  status         BookingStatus @default(PENDING)
+  approxCheckIn  DateTime
+  actualCheckIn  DateTime?
+  checkOut       DateTime?
+  advancePaid    Boolean       @default(false)
+  firstRentPaid  Boolean       @default(false)
+  isCheckedIn    Boolean       @default(false)
+  rentDueDate    DateTime?
+  lastRentPaidAt DateTime?
+  createdAt      DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id])
+  payments       Payment[]
 }
 
 model JobApplication {
-  id         String        @id @default(cuid())
-  jobId      String
-  userId     String
-  resumeUrl  String
-  status     BookingStatus @default(PENDING)
-  createdAt  DateTime      @default(now())
-  job        JobListing    @relation(fields: [jobId], references: [id])
-  user       User          @relation(fields: [userId], references: [id])
+  id        String        @id @default(cuid())
+  jobId     String
+  userId    String
+  resumeUrl String
+  status    BookingStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  job       JobListing    @relation(fields: [jobId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
 }
 
 model JobListing {
-  id             String           @id @default(cuid())
-  title          String
-  company        String
-  description    String
-  location       String
-  salary         String?
-  createdAt      DateTime         @default(now())
-  applications   JobApplication[]
+  id           String           @id @default(cuid())
+  title        String
+  company      String
+  description  String
+  location     String
+  salary       String?
+  createdAt    DateTime         @default(now())
+  applications JobApplication[]
 }
 
 model Lesson {
@@ -162,17 +163,25 @@ model Lesson {
 }
 
 model Payment {
-  id            String               @id @default(cuid())
-  amount        Float
-  currency      String               @default("INR")
-  provider      String               @default("RAZORPAY")
-  providerId    String               @unique
-  status        String
-  createdAt     DateTime             @default(now())
-  consultation  ConsultationBooking?
-  enrollment    Enrollment?
-  hostel        HostelBooking?
-  taxi          TaxiBooking?
+  id             String               @id @default(cuid())
+  userId         String
+  amount         Float
+  currency       String               @default("INR")
+  provider       String               @default("RAZORPAY")
+  providerId     String               @unique
+  status         String
+  type           PaymentType          @default(OTHER)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  consultationId String?              @unique
+  enrollmentId   String?              @unique
+  hostelId       String?
+  taxiId         String?              @unique
+  consultation   ConsultationBooking? @relation(fields: [consultationId], references: [id])
+  enrollment     Enrollment?          @relation(fields: [enrollmentId], references: [id])
+  hostel         HostelBooking?       @relation(fields: [hostelId], references: [id])
+  taxi           TaxiBooking?         @relation(fields: [taxiId], references: [id])
+  user           User                 @relation(fields: [userId], references: [id])
 }
 
 model Profile {
@@ -193,8 +202,8 @@ model Referral {
   rewardAmount   Float          @default(750)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  referrer       User           @relation("Referrer", fields: [referrerId], references: [id])
   referredUser   User           @relation("ReferredUser", fields: [referredUserId], references: [id])
+  referrer       User           @relation("Referrer", fields: [referrerId], references: [id])
 }
 
 model TaxiBooking {
@@ -204,9 +213,8 @@ model TaxiBooking {
   type       String
   pickupTime DateTime
   status     BookingStatus @default(PENDING)
-  paymentId  String?       @unique
   createdAt  DateTime      @default(now())
-  payment    Payment?      @relation(fields: [paymentId], references: [id])
+  payment    Payment?
   user       User          @relation(fields: [userId], references: [id])
   vehicle    Vehicle?      @relation(fields: [vehicleId], references: [id])
 }
@@ -221,32 +229,44 @@ model TheatreBooking {
   user      User          @relation(fields: [userId], references: [id])
 }
 
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
 model User {
-  id                String                @id @default(cuid())
-  email             String                @unique
-  password          String
-  name              String?
-  role              Role                  @default(STUDENT)
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-  resetToken        String?               @unique
-  resetTokenExpiry  DateTime?
-  referralCode      String                @unique @default(cuid())
-  referredByCode    String?
-  complaints        ComplaintTicket[]
-  consultations     ConsultationBooking[]
-  coupons           Coupon[]
-  enrollments       Enrollment[]
-  examAttempts      ExamAttempt[]
-  gamingBookings    GamingBooking[]
-  hostelBooking     HostelBooking?
-  jobApplications   JobApplication[]
-  profile           Profile?
-  referralsMade     Referral[]            @relation("Referrer")
-  referralReceived  Referral?             @relation("ReferredUser")
-  taxiBookings      TaxiBooking[]
-  theatreBookings   TheatreBooking[]
-  wallet            Wallet?
+  id                 String                @id @default(cuid())
+  email              String                @unique
+  password           String
+  name               String?
+  role               Role                  @default(STUDENT)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  resetToken         String?               @unique
+  resetTokenExpiry   DateTime?
+  referralCode       String                @unique @default(cuid())
+  referredByCode     String?
+  complaints         ComplaintTicket[]
+  consultations      ConsultationBooking[]
+  coupons            Coupon[]
+  enrollments        Enrollment[]
+  examAttempts       ExamAttempt[]
+  gamingBookings     GamingBooking[]
+  hostelBooking      HostelBooking?
+  jobApplications    JobApplication[]
+  notifications      Notification[]
+  payments           Payment[]
+  profile            Profile?
+  referralReceived   Referral?             @relation("ReferredUser")
+  referralsMade      Referral[]            @relation("Referrer")
+  taxiBookings       TaxiBooking[]
+  theatreBookings    TheatreBooking[]
+  wallet             Wallet?
   walletTransactions WalletTransaction[]
 }
 
@@ -278,11 +298,21 @@ model WalletTransaction {
   user       User                    @relation(fields: [userId], references: [id])
 }
 
+enum PaymentType {
+  HOSTEL_ADVANCE
+  HOSTEL_RENT
+  COURSE_ENROLLMENT
+  CONSULTATION
+  TAXI_BOOKING
+  OTHER
+}
+
 enum BookingStatus {
   PENDING
   APPROVED
   CANCELLED
   COMPLETED
+  ACTIVE
 }
 
 enum ComplaintStatus {

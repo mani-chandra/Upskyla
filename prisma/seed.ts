@@ -36,7 +36,6 @@ async function main() {
     },
   });
 
-  // Create Feature Flags
   const flags = [
     { name: "consultancy", isEnabled: true, description: "Education Consultancy Module" },
     { name: "hostel", isEnabled: true, description: "Hostel Management Module" },
@@ -46,6 +45,7 @@ async function main() {
     { name: "gaming", isEnabled: true, description: "Gaming Booking Module" },
     { name: "theatre", isEnabled: true, description: "Theatre Booking Module" },
   ];
+
 
   for (const flag of flags) {
     await prisma.featureFlag.upsert({

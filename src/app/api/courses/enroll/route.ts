@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -11,29 +12,54 @@ export async function POST(req: Request) {
 
     const { paymentId, orderId, signature, courseId } = await req.json();
 
-    // In a real app, you'd verify the signature here using crypto
-    // For now, we'll assume it's valid if we got here
+    // 1. Verify Signature
+    const secret = process.env.RAZORPAY_KEY_SECRET || "placeholder_secret";
+    const generated_signature = crypto
+      .createHmac("sha256", secret)
+      .update(orderId + "|" + paymentId)
+      .digest("hex");
 
-    // Update payment status
-    const payment = await prisma.payment.update({
-      where: { providerId: orderId },
-      data: { status: "captured" },
+    if (generated_signature !== signature) {
+      return NextResponse.json({ message: "Invalid signature" }, { status: 400 });
+    }
+
+    // 2. Start Transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Find and update payment status
+      const payment = await tx.payment.update({
+        where: { providerId: orderId },
+        data: { 
+          status: "captured",
+          type: "COURSE_ENROLLMENT" as any
+        },
+      });
+
+      // Create enrollment
+      const enrollment = await tx.enrollment.create({
+        data: {
+          userId: session.user.id,
+          courseId: courseId,
+        },
+      });
+
+      // Connect payment to enrollment
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: { 
+          enrollment: {
+            connect: { id: enrollment.id }
+          }
+        }
+      });
+
+      return enrollment;
     });
 
-    // Create enrollment
-    const enrollment = await prisma.enrollment.create({
-      data: {
-        userId: session.user.id,
-        courseId: courseId,
-        paymentId: payment.id,
-      },
-    });
-
-    return NextResponse.json({ success: true, enrollment });
-  } catch (error) {
+    return NextResponse.json({ success: true, enrollment: result });
+  } catch (error: any) {
     console.error("Enrollment error:", error);
     return NextResponse.json(
-      { message: "An error occurred during enrollment" },
+      { message: error.message || "An error occurred during enrollment" },
       { status: 500 }
     );
   }

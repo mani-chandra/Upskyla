@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { addMonths } from "date-fns";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { paymentId, orderId, signature, couponId, approxCheckIn } = await req.json();
+    const { paymentId, orderId, signature } = await req.json();
 
     // 1. Verify Signature
     const secret = process.env.RAZORPAY_KEY_SECRET || "placeholder_secret";
@@ -40,51 +41,40 @@ export async function POST(req: Request) {
         data: { status: "captured" },
       });
 
-      // Create Hostel Booking
-      const booking = await tx.hostelBooking.create({
+      // Find user's hostel booking
+      const booking = await tx.hostelBooking.findUnique({
+        where: { userId: session.user.id }
+      });
+
+      if (!booking) {
+        throw new Error("Hostel booking not found");
+      }
+
+      // Update Hostel Booking with first rent payment info
+      const updatedBooking = await tx.hostelBooking.update({
+        where: { id: booking.id },
         data: {
-          userId: session.user.id,
-          roomNumber: null, // To be decided by admin
-          status: "PENDING",
-          approxCheckIn: new Date(approxCheckIn),
-          advancePaid: true,
+          firstRentPaid: true,
+          lastRentPaidAt: new Date(),
+          // Next rent due date is exactly 1 month from now
+          rentDueDate: addMonths(new Date(), 1),
           payments: {
             connect: { id: updatedPayment.id }
           }
         },
       });
 
-      // If coupon used, mark it as used
-      if (couponId) {
-        await tx.coupon.update({
-          where: { id: couponId },
-          data: { isUsed: true },
-        });
-      }
-
-      // Update Referral status if exists
-      const referral = await tx.referral.findUnique({
-        where: { referredUserId: session.user.id },
-      });
-
-      if (referral) {
-        await tx.referral.update({
-          where: { id: referral.id },
-          data: { status: "ADVANCE_PAID" },
-        });
-      }
-
-      return { booking, referral };
+      return { booking: updatedBooking };
     });
 
     return NextResponse.json({
-      message: "Booking successful",
+      message: "Rent payment successful",
       booking: result.booking,
     });
   } catch (error: any) {
-    console.error("Booking error:", error);
+    console.error("Rent payment error:", error);
     return NextResponse.json(
-      { message: error.message || "An error occurred during booking" },
+      { message: error.message || "An error occurred during rent payment" },
       { status: 500 }
     );
   }

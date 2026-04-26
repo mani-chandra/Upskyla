@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const bookings = await prisma.hostelBooking.findMany({
+    const bookings = await (prisma.hostelBooking as any).findMany({
       include: {
         user: {
           select: {
@@ -18,7 +18,7 @@ export async function GET() {
             email: true,
           },
         },
-        payment: true,
+        payments: true,
       },
       orderBy: { createdAt: "desc" },
     });

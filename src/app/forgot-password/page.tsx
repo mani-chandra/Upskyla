@@ -10,11 +10,13 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [debugUrl, setDebugUrl] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
     setMessage("");
+    setDebugUrl("");
 
     try {
       const res = await fetch("/api/auth/forgot-password", {
@@ -28,6 +30,9 @@ export default function ForgotPasswordPage() {
       if (res.ok) {
         setStatus("success");
         setMessage(data.message || "Reset link sent! Please check your email.");
+        if (data.debugUrl) {
+          setDebugUrl(data.debugUrl);
+        }
       } else {
         setStatus("error");
         setMessage(data.message || "Failed to send reset link.");
@@ -138,7 +143,20 @@ export default function ForgotPasswordPage() {
                   <Send className="w-10 h-10" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Check your email</h3>
-                <p className="text-gray-500 mb-8">{message}</p>
+                <p className="text-gray-500 mb-6">{message}</p>
+                
+                {debugUrl && (
+                  <div className="mb-8 p-4 bg-primary-50 border border-primary-100 rounded-2xl">
+                    <p className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Development Mode:</p>
+                    <Link 
+                      href={debugUrl}
+                      className="text-sm font-medium text-primary-700 break-all hover:underline"
+                    >
+                      {debugUrl}
+                    </Link>
+                  </div>
+                )}
+
                 <Link 
                   href="/login"
                   className="inline-flex items-center justify-center w-full py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-2xl shadow-lg shadow-primary-200 transition-all hover:scale-[1.02] active:scale-[0.98]"

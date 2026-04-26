@@ -64,13 +64,13 @@ export default function AdminDashboardPage() {
         fetch("/api/courses").then(res => res.json())
       ]);
 
-      setFlags(flagsData);
-      setReferrals(referralsData.referrals || []);
-      setWithdrawals(withdrawalsData || []);
-      setUsers(usersData || []);
-      setHostelBookings(hostelData || []);
+      setFlags(Array.isArray(flagsData) ? flagsData : []);
+      setReferrals(referralsData?.referrals || []);
+      setWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setHostelBookings(Array.isArray(hostelData) ? hostelData : []);
 
-      const data = coursesData;
+      const data = Array.isArray(coursesData) ? coursesData : [];
 
       // Merge with initialCourses to preserve icon components
       const mergedCourses = initialCourses.map(initialCourse => {
@@ -517,36 +517,67 @@ export default function AdminDashboardPage() {
                     <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-6 py-4">
                         <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors">{booking.user.name || booking.user.email}</p>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                          {booking.roomNumber === "TBD" ? (
+                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                          {booking.roomNumber ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-900 font-black">Room: {booking.roomNumber}</span>
+                              <button 
+                                onClick={() => setSelectedBooking(booking)}
+                                className="text-[10px] text-accent-primary hover:underline"
+                              >
+                                (Change)
+                              </button>
+                            </div>
+                          ) : (
                             <button 
                               onClick={() => setSelectedBooking(booking)}
                               className="text-accent-primary hover:underline flex items-center gap-1"
                             >
                               <Plus className="h-3 w-3" /> Allot Room
                             </button>
-                          ) : (
-                            `Room: ${booking.roomNumber}`
                           )}
-                        </p>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-2">
+                          <StatusBadge active={booking.advancePaid} label="Advance Paid" />
+                          <StatusBadge active={booking.firstRentPaid} label="First Rent" />
                           <StatusBadge active={booking.isCheckedIn} label="Checked In" />
-                          <StatusBadge active={booking.firstRentPaid} label="Rent Paid" />
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-3">
-                          <ToggleButton 
-                            active={booking.isCheckedIn} 
-                            onClick={() => updateHostelStatus(booking.id, "isCheckedIn", !booking.isCheckedIn)}
-                            label="Check-in"
-                          />
+                          {selectedBooking?.id === booking.id && (
+                            <div className="flex items-center gap-2 mr-4">
+                              <input 
+                                type="text" 
+                                placeholder="Room #"
+                                className="w-20 px-2 py-1 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-accent-primary outline-none"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    updateHostelStatus(booking.id, null, null, (e.target as HTMLInputElement).value);
+                                    setSelectedBooking(null);
+                                  }
+                                }}
+                                autoFocus
+                              />
+                              <button 
+                                onClick={() => setSelectedBooking(null)}
+                                className="text-[10px] text-slate-400 uppercase font-black"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
                           <ToggleButton 
                             active={booking.firstRentPaid} 
                             onClick={() => updateHostelStatus(booking.id, "firstRentPaid", !booking.firstRentPaid)}
                             label="Rent"
+                          />
+                          <ToggleButton 
+                            active={booking.isCheckedIn} 
+                            onClick={() => updateHostelStatus(booking.id, "isCheckedIn", !booking.isCheckedIn)}
+                            label="Check-in"
                           />
                         </div>
                       </td>

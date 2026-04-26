@@ -16,13 +16,17 @@ export async function GET() {
       include: {
         hostelBooking: {
           include: {
-            payment: true,
+            payments: true,
           },
         },
         coupons: {
           where: { isUsed: false },
         },
         wallet: true,
+        notifications: {
+          orderBy: { createdAt: 'desc' },
+          take: 5
+        },
         referralsMade: {
           include: {
             referredUser: {
@@ -44,6 +48,7 @@ export async function GET() {
       hostelBooking: user.hostelBooking || null,
       coupons: user.coupons || [],
       wallet: user.wallet || null,
+      notifications: user.notifications || [],
       referralCode: user.referralCode || "",
       referrals: user.referralsMade || [],
     };
