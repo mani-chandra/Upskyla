@@ -49,9 +49,14 @@ export function CourseCard({ course, idx }: CourseCardProps) {
           <div className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-white/20 shadow-lg">
             Batch 2026 Open
           </div>
-          {(course.id === 'fsd' || course.id === 'aiml') && (
+          {(course.id === 'aiml') && (
             <div className="px-3 py-1 rounded-full bg-amber-500 text-white text-[9px] font-black uppercase tracking-widest shadow-lg animate-pulse">
               Bestseller
+            </div>
+          )}
+          {course.description.toLowerCase().includes('early bird') && (
+            <div className="px-3 py-1 rounded-full bg-primary-600 text-white text-[9px] font-black uppercase tracking-widest shadow-lg border border-white/20">
+              Early Bird Offer
             </div>
           )}
         </div>

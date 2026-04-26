@@ -57,10 +57,8 @@ async function main() {
 
   // Create Sample Courses
   const courses = [
-    { id: "fsd", title: "Full Stack Development", description: "Master the art of building complete web applications from scratch.", price: 24999 },
-    { id: "aiml", title: "AI / ML & Data Science", description: "Learn to build intelligent systems and data-driven models.", price: 29999 },
-    { id: "cyber", title: "Cyber Security", description: "Protect digital assets and learn ethical hacking techniques.", price: 27999 },
-    { id: "devops", title: "Cloud & DevOps", description: "Bridge the gap between development and operations with modern tools.", price: 31999 },
+    { id: "aiml", title: "AI / ML & Data Science", description: "Master AI, Machine Learning, and Data Science with our early bird offer.", price: 14500 },
+    { id: "cyber", title: "Cyber Security", description: "Become a cyber security expert with our early bird offer.", price: 14500 },
   ];
 
   for (const course of courses) {

@@ -228,7 +228,14 @@ export default function CourseDetailPage() {
                 ))}
               </div>
               <div className="pt-6 border-t border-white/10">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Program Fee</p>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Program Fee</p>
+                  {course.description.toLowerCase().includes('early bird') && (
+                    <span className="px-3 py-1 rounded-full bg-accent-primary text-white text-[9px] font-black uppercase tracking-widest animate-pulse">
+                      Early Bird Offer
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-end gap-3 mb-8">
                   <span className="text-5xl font-black text-white">{formatCurrency(course.price)}</span>
                   <span className="text-slate-400 font-bold mb-2">/ Total</span>
