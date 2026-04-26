@@ -13,8 +13,16 @@ export async function GET() {
 
     const referrals = await (prisma as any).referral.findMany({
       include: {
-        referrer: { select: { name: true, email: true } },
-        referredUser: { select: { name: true, email: true } },
+        referrer: { select: { name: true, email: true, role: true, referralCode: true } },
+        referredUser: { 
+          select: { 
+            name: true, 
+            email: true,
+            payments: { where: { status: "COMPLETED" } },
+            enrollments: { include: { course: true } },
+            hostelBooking: true
+          } 
+        },
       },
       orderBy: { createdAt: "desc" },
     });

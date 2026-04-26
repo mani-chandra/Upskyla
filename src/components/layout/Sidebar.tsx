@@ -19,13 +19,14 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import { useDashboard } from "@/lib/context/DashboardContext";
 
 const sidebarItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Consultancy", href: "/consultancy", icon: GraduationCap, flag: "consultancy" },
-  { name: "Hostel", href: "/hostel", icon: Hotel, flag: "hostel" },
-  { name: "Courses", href: "/courses", icon: BookOpen, flag: "courses" },
-  { name: "Taxi & Rental", href: "/taxi", icon: Car, flag: "taxi" },
-  { name: "Job Portal", href: "/jobs", icon: Briefcase, flag: "jobs" },
-  { name: "Wallet", href: "/wallet", icon: Wallet },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["STUDENT"] },
+  { name: "Moderator Panel", href: "/moderator", icon: ShieldCheck, roles: ["MODERATOR"] },
+  { name: "Consultancy", href: "/consultancy", icon: GraduationCap, flag: "consultancy", roles: ["STUDENT"] },
+  { name: "Hostel", href: "/hostel", icon: Hotel, flag: "hostel", roles: ["STUDENT"] },
+  { name: "Courses", href: "/courses", icon: BookOpen, flag: "courses", roles: ["STUDENT"] },
+  { name: "Taxi & Rental", href: "/taxi", icon: Car, flag: "taxi", roles: ["STUDENT"] },
+  { name: "Job Portal", href: "/jobs", icon: Briefcase, flag: "jobs", roles: ["STUDENT"] },
+  { name: "Wallet", href: "/wallet", icon: Wallet, roles: ["STUDENT", "MODERATOR"] },
 ];
 
 const itemVariants: Variants = {
@@ -85,7 +86,9 @@ export function Sidebar() {
         </div>
         
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-          {sidebarItems.map((item, idx) => {
+          {sidebarItems
+            .filter(item => !item.roles || (user && item.roles.includes(user.role)))
+            .map((item, idx) => {
             const flag = flags.find(f => f.name === item.flag);
             const isDisabled = item.flag && flag && !flag.isEnabled;
             const isActive = pathname.startsWith(item.href);

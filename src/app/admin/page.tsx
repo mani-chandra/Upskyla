@@ -478,10 +478,16 @@ export default function AdminDashboardPage() {
                         <span className={cn(
                           "px-3 py-1 text-[9px] font-black rounded-lg uppercase tracking-widest border",
                           user.role === "ADMIN" ? "bg-purple-50 text-purple-700 border-purple-100" :
+                          user.role === "MODERATOR" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
                           user.role === "STAFF" ? "bg-blue-50 text-blue-700 border-blue-100" : "bg-slate-100 text-slate-600 border-slate-200"
                         )}>
                           {user.role}
                         </span>
+                        {user.referralCode && (
+                          <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">
+                            Ref: <span className="text-slate-900">{user.referralCode}</span>
+                          </p>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <select 
@@ -490,6 +496,7 @@ export default function AdminDashboardPage() {
                           className="text-xs font-black bg-white border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-all cursor-pointer"
                         >
                           <option value="STUDENT">Student</option>
+                          <option value="MODERATOR">Moderator</option>
                           <option value="STAFF">Staff</option>
                           <option value="ADMIN">Admin</option>
                         </select>

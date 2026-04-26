@@ -14,7 +14,10 @@ export async function GET() {
       email: true,
       name: true,
       role: true,
+      referralCode: true,
+      createdAt: true,
     },
+    orderBy: { createdAt: "desc" },
   });
 
   return NextResponse.json(users);
@@ -29,7 +32,7 @@ export async function PATCH(req: Request) {
 
     const { userId, role } = await req.json();
 
-    if (!["STUDENT", "ADMIN", "STAFF"].includes(role)) {
+    if (!["STUDENT", "ADMIN", "STAFF", "MODERATOR"].includes(role)) {
       return NextResponse.json({ message: "Invalid role" }, { status: 400 });
     }
 

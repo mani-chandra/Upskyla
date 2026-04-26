@@ -33,7 +33,15 @@ export default function LoginPage() {
       if (res.ok) {
         // Refresh the user context before redirecting
         await refreshUser();
-        router.push("/dashboard");
+        
+        // Redirect based on role
+        if (data.user.role === "MODERATOR") {
+          router.push("/moderator");
+        } else if (data.user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
       } else {
         setError(data.message || "Login failed");
       }

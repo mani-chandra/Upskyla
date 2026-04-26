@@ -333,6 +333,7 @@ enum Role {
   STUDENT
   ADMIN
   STAFF
+  MODERATOR
 }
 
 enum WalletTransactionStatus {

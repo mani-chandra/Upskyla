@@ -36,6 +36,22 @@ async function main() {
     },
   });
 
+  // Create Moderator User
+  const moderator = await prisma.user.upsert({
+    where: { email: "mod@upskyla.com" },
+    update: { password: hashedPassword },
+    create: {
+      email: "mod@upskyla.com",
+      name: "Moderator One",
+      password: hashedPassword,
+      role: "MODERATOR" as any,
+      referralCode: "MOD100",
+      profile: {
+        create: {},
+      },
+    },
+  });
+
   const flags = [
     { name: "consultancy", isEnabled: true, description: "Education Consultancy Module" },
     { name: "hostel", isEnabled: true, description: "Hostel Management Module" },

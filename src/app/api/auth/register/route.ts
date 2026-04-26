@@ -32,7 +32,20 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Generate a unique referral code for the new user
-    const newReferralCode = generateCode(8);
+    let newReferralCode = generateCode(8);
+    
+    // Check for collisions (rare but good practice)
+    let isUnique = false;
+    while (!isUnique) {
+      const existingCode = await prisma.user.findUnique({
+        where: { referralCode: newReferralCode } as any
+      });
+      if (!existingCode) {
+        isUnique = true;
+      } else {
+        newReferralCode = generateCode(8);
+      }
+    }
 
     // Check if a referral code was used
     let referrer = null;

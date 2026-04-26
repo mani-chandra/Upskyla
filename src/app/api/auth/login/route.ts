@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       email: user.email,
       name: user.name,
       role: user.role,
+      referralCode: user.referralCode,
     };
 
     console.log("Creating session for:", email);
