@@ -3,6 +3,7 @@ import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { addMonths } from "date-fns";
+import { processReferralReward } from "@/lib/referral-utils";
 
 export async function POST(req: Request) {
   try {
@@ -63,6 +64,9 @@ export async function POST(req: Request) {
           }
         },
       });
+
+      // Process referral reward if applicable
+      await processReferralReward(tx, session.user.id);
 
       return { booking: updatedBooking };
     });

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import crypto from "crypto";
+import { processReferralReward } from "@/lib/referral-utils";
 
 export async function POST(req: Request) {
   try {
@@ -30,8 +31,8 @@ export async function POST(req: Request) {
         where: { providerId: orderId },
         data: { 
           status: "captured",
-          type: "COURSE_ENROLLMENT" as any
-        },
+          type: "COURSE_ENROLLMENT"
+        } as any,
       });
 
       // Create enrollment
@@ -51,6 +52,9 @@ export async function POST(req: Request) {
           }
         }
       });
+
+      // Process referral reward if applicable
+      await processReferralReward(tx, session.user.id);
 
       return enrollment;
     });

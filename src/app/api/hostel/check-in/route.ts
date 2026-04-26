@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { processReferralReward } from "@/lib/referral-utils";
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "No booking found" }, { status: 404 });
     }
 
-    if (!booking.advancePaid || !booking.firstRentPaid) {
+    if (!(booking as any).advancePaid || !booking.firstRentPaid) {
       return NextResponse.json(
         { message: "Advance and first rent must be paid before check-in" },
         { status: 400 }
@@ -37,20 +38,11 @@ export async function POST(req: Request) {
         isCheckedIn: true,
         actualCheckIn: new Date(),
         status: "ACTIVE"
-      }
+      } as any
     });
 
-    // Update referral status if applicable
-    const referral = await prisma.referral.findUnique({
-      where: { referredUserId: session.user.id }
-    });
-
-    if (referral) {
-      await prisma.referral.update({
-        where: { id: referral.id },
-        data: { status: "CHECKED_IN" }
-      });
-    }
+    // Process referral reward if applicable
+    await processReferralReward(prisma, session.user.id);
 
     return NextResponse.json({
       message: "Check-in successful",
