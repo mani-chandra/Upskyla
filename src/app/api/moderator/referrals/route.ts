@@ -13,6 +13,20 @@ export async function GET() {
 
     const moderatorId = session.user.id;
 
+    // Fetch all approved credit transactions for this moderator that are linked to referrals
+    const moderatorTransactions = await prisma.walletTransaction.findMany({
+      where: {
+        userId: moderatorId,
+        type: "CREDIT",
+        status: "APPROVED",
+        referralId: { not: null }
+      },
+      select: {
+        amount: true,
+        referralId: true
+      }
+    });
+
     const referrals = await (prisma as any).referral.findMany({
       where: { referrerId: moderatorId },
       include: {
@@ -28,16 +42,6 @@ export async function GET() {
                 amount: true,
                 type: true,
                 createdAt: true
-              }
-            },
-            walletTransactions: {
-              where: { 
-                type: "CREDIT",
-                status: "APPROVED"
-              },
-              select: {
-                amount: true,
-                referralId: true
               }
             },
             enrollments: {
@@ -63,8 +67,8 @@ export async function GET() {
       const totalPaid = user.payments.reduce((acc: number, p: any) => acc + p.amount, 0);
       
       // Calculate reward earned for this specific referral
-      // We look at the referred user's wallet transactions that match this referral ID
-      const rewardEarned = user.walletTransactions
+      // Filter the moderator's transactions for this specific referral ID
+      const rewardEarned = moderatorTransactions
         .filter((wt: any) => wt.referralId === ref.id)
         .reduce((acc: number, wt: any) => acc + wt.amount, 0);
       

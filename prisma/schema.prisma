@@ -62,15 +62,16 @@ model Course {
 }
 
 model Enrollment {
-  id         String   @id @default(cuid())
-  userId     String
-  courseId   String
-  progress   Int      @default(0)
-  completed  Boolean  @default(false)
-  enrolledAt DateTime @default(now())
-  course     Course   @relation(fields: [courseId], references: [id])
-  user       User     @relation(fields: [userId], references: [id])
-  payment    Payment?
+  id               String   @id @default(cuid())
+  userId           String
+  courseId         String
+  progress         Int      @default(0)
+  completed        Boolean  @default(false)
+  completedLessons Json?    @default("[]")
+  enrolledAt       DateTime @default(now())
+  course           Course   @relation(fields: [courseId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
+  payment          Payment?
 }
 
 model Exam {
@@ -282,21 +283,27 @@ model Vehicle {
 }
 
 model Wallet {
-  id      String @id @default(cuid())
-  userId  String @unique
-  balance Float  @default(0)
-  user    User   @relation(fields: [userId], references: [id])
+  id            String @id @default(cuid())
+  userId        String @unique
+  balance       Float  @default(0)
+  user          User   @relation(fields: [userId], references: [id])
+  
+  // Bank Details for Moderators
+  accountNumber String?
+  accountType   String?
+  ifscCode      String?
 }
 
 model WalletTransaction {
-  id         String                  @id @default(cuid())
-  userId     String
-  amount     Float
-  type       WalletTransactionType
-  status     WalletTransactionStatus @default(PENDING)
-  referralId String?
-  createdAt  DateTime                @default(now())
-  user       User                    @relation(fields: [userId], references: [id])
+  id          String                  @id @default(cuid())
+  userId      String
+  amount      Float
+  type        WalletTransactionType
+  status      WalletTransactionStatus @default(PENDING)
+  referralId  String?
+  description String?
+  createdAt   DateTime                @default(now())
+  user        User                    @relation(fields: [userId], references: [id])
 }
 
 enum PaymentType {

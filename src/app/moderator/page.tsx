@@ -14,7 +14,11 @@ import {
   Filter,
   ArrowUpRight,
   IndianRupee,
-  Loader2
+  Loader2,
+  X,
+  ShieldCheck,
+  AlertCircle,
+  Trophy
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -22,10 +26,16 @@ import { cn } from "@/lib/utils";
 interface Stats {
   totalReferred: number;
   totalRevenue: number;
+  totalEarned: number;
   courseEnrollments: number;
   hostelBookings: number;
   referralCode: string;
   walletBalance: number;
+  bankDetails: {
+    accountNumber: string | null;
+    accountType: string | null;
+    ifscCode: string | null;
+  } | null;
 }
 
 interface Referral {
@@ -46,6 +56,13 @@ export default function ModeratorDashboard() {
   const [withdrawing, setWithdrawing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [bankDetails, setBankDetails] = useState({
+    accountNumber: "",
+    accountType: "SAVINGS",
+    ifscCode: ""
+  });
+  const [crossChecked, setCrossChecked] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -59,6 +76,14 @@ export default function ModeratorDashboard() {
       
       setStats(statsData);
       setReferrals(referralsData);
+      
+      if (statsData.bankDetails?.accountNumber) {
+        setBankDetails({
+          accountNumber: statsData.bankDetails.accountNumber,
+          accountType: statsData.bankDetails.accountType || "SAVINGS",
+          ifscCode: statsData.bankDetails.ifscCode
+        });
+      }
     } catch (error) {
       console.error("Error fetching moderator data:", error);
     } finally {
@@ -70,21 +95,36 @@ export default function ModeratorDashboard() {
     fetchData();
   }, []);
 
-  const handleWithdraw = async () => {
+  const handleWithdrawSubmit = async () => {
     if ((stats?.walletBalance || 0) < 750) {
       alert("Minimum withdrawal amount is ₹750");
       return;
     }
+
+    if (!bankDetails.accountNumber || !bankDetails.ifscCode) {
+      alert("Please provide bank details");
+      return;
+    }
+
+    if (!crossChecked) {
+      alert("Please cross-check and confirm your details");
+      return;
+    }
+
     setWithdrawing(true);
     try {
       const res = await fetch("/api/wallet/withdraw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: stats?.walletBalance }),
+        body: JSON.stringify({ 
+          amount: stats?.walletBalance,
+          bankDetails: stats?.bankDetails?.accountNumber ? null : bankDetails // Only send if it's first time or changed
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         alert("Withdrawal request submitted! Admin will approve it shortly.");
+        setShowWithdrawModal(false);
         fetchData(); // Refresh stats/balance
       } else {
         alert(data.message || "Failed to submit withdrawal request");
@@ -172,7 +212,7 @@ export default function ModeratorDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {[
             { label: "Total Referred", value: stats?.totalReferred, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-            { label: "Total Revenue", value: formatCurrency(stats?.totalRevenue || 0), icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
+            { label: "Rewards Earned", value: formatCurrency(stats?.totalEarned || 0), icon: Trophy, color: "text-emerald-600", bg: "bg-emerald-50" },
             { label: "Course Sales", value: stats?.courseEnrollments, icon: BookOpen, color: "text-amber-600", bg: "bg-amber-50" },
             { label: "PG Bookings", value: stats?.hostelBookings, icon: Hotel, color: "text-purple-600", bg: "bg-purple-50" },
           ].map((stat, i) => (
@@ -207,16 +247,12 @@ export default function ModeratorDashboard() {
             </div>
             
             <button
-              onClick={handleWithdraw}
+              onClick={() => setShowWithdrawModal(true)}
               disabled={(stats?.walletBalance || 0) < 750 || withdrawing}
               className="mt-6 w-full py-3 bg-primary-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group/btn"
             >
-              {withdrawing ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                <>
-                  Withdraw
-                  <ArrowUpRight className="w-4 h-4 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                </>
-              )}
+              Withdraw
+              <ArrowUpRight className="w-4 h-4 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
             </button>
           </motion.div>
         </div>
@@ -319,6 +355,113 @@ export default function ModeratorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Withdrawal Modal */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"
+            onClick={() => setShowWithdrawModal(false)}
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-white rounded-[2.5rem] w-full max-w-lg relative z-10 overflow-hidden shadow-2xl"
+          >
+            <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center">
+                  <IndianRupee className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Withdraw Funds</h2>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available: {formatCurrency(stats?.walletBalance || 0)}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowWithdrawModal(false)} className="p-2 hover:bg-slate-50 rounded-xl transition-colors text-slate-400">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-8 space-y-6">
+              {!stats?.bankDetails?.accountNumber ? (
+                <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                  <p className="text-xs font-bold text-amber-700 leading-relaxed">
+                    It looks like this is your first withdrawal. Please provide your bank details accurately for the transaction.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex gap-3">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <p className="text-xs font-bold text-emerald-700 leading-relaxed">
+                    Confirm your existing bank details for this withdrawal.
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Number</label>
+                  <input 
+                    type="text"
+                    value={bankDetails.accountNumber}
+                    onChange={(e) => setBankDetails({...bankDetails, accountNumber: e.target.value})}
+                    placeholder="Enter account number"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none font-bold text-slate-900 transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">IFSC Code</label>
+                    <input 
+                      type="text"
+                      value={bankDetails.ifscCode}
+                      onChange={(e) => setBankDetails({...bankDetails, ifscCode: e.target.value.toUpperCase()})}
+                      placeholder="IFSC Code"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none font-bold text-slate-900 transition-all uppercase"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Type</label>
+                    <select 
+                      value={bankDetails.accountType}
+                      onChange={(e) => setBankDetails({...bankDetails, accountType: e.target.value})}
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none font-bold text-slate-900 transition-all appearance-none"
+                    >
+                      <option value="SAVINGS">SAVINGS</option>
+                      <option value="CURRENT">CURRENT</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer group hover:border-primary-200 transition-all">
+                <input 
+                  type="checkbox"
+                  checked={crossChecked}
+                  onChange={(e) => setCrossChecked(e.target.checked)}
+                  className="w-5 h-5 rounded-lg border-slate-300 text-primary-600 focus:ring-primary-500 transition-all cursor-pointer"
+                />
+                <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900">
+                  I have cross-checked my bank details and confirm they are correct.
+                </span>
+              </label>
+
+              <button 
+                onClick={handleWithdrawSubmit}
+                disabled={withdrawing || !crossChecked}
+                className="w-full py-5 bg-primary-600 text-white rounded-[1.5rem] font-black text-sm uppercase tracking-[0.2em] hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+              >
+                {withdrawing ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Withdrawal Request"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

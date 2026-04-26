@@ -13,7 +13,8 @@ import {
   LogOut,
   Wallet,
   Settings,
-  X
+  X,
+  Library
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, Variants, AnimatePresence } from "framer-motion";
@@ -25,9 +26,10 @@ const sidebarItems = [
   { name: "Consultancy", href: "/consultancy", icon: GraduationCap, flag: "consultancy", roles: ["STUDENT"] },
   { name: "Hostel", href: "/hostel", icon: Hotel, flag: "hostel", roles: ["STUDENT"] },
   { name: "Courses", href: "/courses", icon: BookOpen, flag: "courses", roles: ["STUDENT"] },
+  { name: "My Courses", href: "/student/courses", icon: Library, roles: ["STUDENT"] },
   { name: "Taxi & Rental", href: "/taxi", icon: Car, flag: "taxi", roles: ["STUDENT"] },
   { name: "Job Portal", href: "/jobs", icon: Briefcase, flag: "jobs", roles: ["STUDENT"] },
-  { name: "Wallet", href: "/wallet", icon: Wallet, roles: ["STUDENT", "MODERATOR"] },
+  { name: "Wallet", href: "/wallet", icon: Wallet, roles: ["STUDENT"] },
   { name: "Settings", href: "/settings", icon: Settings, roles: ["STUDENT", "MODERATOR", "ADMIN"] },
 ];
 

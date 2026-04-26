@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
 
     const userId = session.user.id;
-    const { amount } = await req.json();
+    const { amount, bankDetails } = await req.json();
 
     if (!amount || amount < 750) {
       return NextResponse.json(
@@ -20,14 +20,29 @@ export async function POST(req: Request) {
     }
 
     // Use transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Check current wallet balance
+    const result = await prisma.$transaction(async (tx: any) => {
+      // 1. Check current wallet balance and bank details
       const wallet = await tx.wallet.findUnique({
         where: { userId },
       });
 
       if (!wallet || wallet.balance < amount) {
         throw new Error("Insufficient balance");
+      }
+
+      // If bank details are provided, update them
+      if (bankDetails) {
+        await tx.wallet.update({
+          where: { userId },
+          data: {
+            accountNumber: bankDetails.accountNumber,
+            accountType: bankDetails.accountType,
+            ifscCode: bankDetails.ifscCode,
+          },
+        });
+      } else if (!wallet.accountNumber || !wallet.ifscCode) {
+        // If no bank details in DB and none provided in request
+        throw new Error("Bank details are required for withdrawal");
       }
 
       // 2. Create a PENDING DEBIT transaction
@@ -37,6 +52,7 @@ export async function POST(req: Request) {
           amount,
           type: "DEBIT",
           status: "PENDING",
+          description: "Withdrawal Request"
         },
       });
 
