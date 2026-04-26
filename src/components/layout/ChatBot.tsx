@@ -12,7 +12,10 @@ import {
   Sparkles,
   Minus,
   Maximize2,
-  ExternalLink
+  ExternalLink,
+  ChevronDown,
+  RefreshCw,
+  Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +37,15 @@ export function ChatBot() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const suggestions = [
+    { label: "AI/ML Courses", icon: Sparkles },
+    { label: "Book a Hostel", icon: Bot },
+    { label: "Job Openings", icon: ExternalLink },
+    { label: "Contact Support", icon: MessageCircle },
+  ];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -42,24 +53,26 @@ export function ChatBot() {
     }
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (textOverride?: string) => {
+    const messageText = textOverride || input;
+    if (!messageText.trim() || isLoading) return;
 
     const userMessage: Message = {
       role: "user",
-      content: input,
+      content: messageText,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!textOverride) setInput("");
     setIsLoading(true);
+    setShowSuggestions(false);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: messageText }),
       });
 
       const data = await response.json();
@@ -91,7 +104,7 @@ export function ChatBot() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="mb-4 w-[350px] sm:w-[400px] h-[500px] bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col"
+            className="mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[min(600px,calc(100vh-10rem))] bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="bg-slate-900 p-6 flex items-center justify-between">
@@ -126,37 +139,69 @@ export function ChatBot() {
             {/* Messages */}
             <div 
               ref={scrollRef}
-              className="flex-grow overflow-y-auto p-6 space-y-4 bg-slate-50/50"
+              className="flex-grow overflow-y-auto p-6 space-y-4 bg-slate-50/50 scroll-smooth"
             >
               {messages.map((msg, i) => (
                 <motion.div
-                  initial={{ opacity: 0, x: msg.role === "user" ? 20 : -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: msg.role === "user" ? 20 : -20, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ type: "spring", damping: 20, stiffness: 100 }}
                   key={i}
                   className={cn(
-                    "flex flex-col max-w-[80%]",
+                    "flex flex-col max-w-[85%]",
                     msg.role === "user" ? "ml-auto items-end" : "items-start"
                   )}
                 >
                   <div className={cn(
                     "p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm",
                     msg.role === "user" 
-                      ? "bg-primary-600 text-white rounded-tr-none" 
+                      ? "bg-primary-600 text-white rounded-tr-none shadow-primary-200" 
                       : "bg-white text-slate-700 border border-slate-100 rounded-tl-none"
                   )}>
                     {msg.content}
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                  <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest px-1">
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </motion.div>
               ))}
+              
               {isLoading && (
-                <div className="flex items-center gap-2 text-primary-600">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">AI is thinking...</span>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 text-primary-600 bg-white/80 backdrop-blur-sm p-3 rounded-2xl border border-slate-100 w-fit"
+                >
+                  <div className="flex gap-1">
+                    <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 bg-primary-600 rounded-full" />
+                    <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-primary-600 rounded-full" />
+                    <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-primary-600 rounded-full" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">AI is typing...</span>
+                </motion.div>
               )}
+
+              <AnimatePresence>
+                {showSuggestions && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="grid grid-cols-2 gap-2 pt-4"
+                  >
+                    {suggestions.map((s) => (
+                      <button
+                        key={s.label}
+                        onClick={() => handleSend(s.label)}
+                        className="flex items-center gap-2 p-3 bg-white border border-slate-100 rounded-xl hover:border-primary-500 hover:text-primary-600 transition-all text-xs font-bold text-slate-600 text-left group"
+                      >
+                        <s.icon className="w-4 h-4 text-slate-400 group-hover:text-primary-500" />
+                        {s.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Input */}
