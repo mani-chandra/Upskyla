@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { 
   BookOpen, 
   Play, 
-  CheckCircle2, 
   Clock, 
   Trophy, 
   ArrowRight,
   Loader2,
-  AlertCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -87,10 +86,11 @@ export default function StudentCourses() {
                 {/* Course Thumbnail */}
                 <div className="aspect-video bg-slate-100 relative overflow-hidden">
                   {enrollment.course.thumbnail ? (
-                    <img 
+                    <Image 
                       src={enrollment.course.thumbnail} 
                       alt={enrollment.course.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary-50">

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ModuleLayout } from "@/components/layout/ModuleLayout";
@@ -13,9 +14,7 @@ import {
   Users2, 
   Rocket, 
   CheckCircle2, 
-  ArrowRight,
   ShieldCheck,
-  GraduationCap,
   Sparkles,
   HelpCircle,
   Code2,
@@ -165,10 +164,12 @@ export default function CourseDetailPage() {
               transition={{ delay: 0.3 }}
               className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl shadow-slate-200 group"
             >
-              <img 
+              <Image 
                 src={course.image} 
                 alt={course.title} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               <div className={cn(

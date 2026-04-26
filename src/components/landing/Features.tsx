@@ -1,6 +1,7 @@
 "use client";
 
 import { GraduationCap, Hotel, Car, BookOpen, Briefcase, Wallet, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -191,11 +192,14 @@ function ModuleSection({ module, index }: { module: typeof modules[0], index: nu
             whileHover={{ rotate: 0, scale: 1.01 }}
             className="relative z-10 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 md:border-8 border-white"
           >
-            <img 
-              src={module.image} 
-              alt={module.title} 
-              className="w-full aspect-video md:aspect-[4/3] object-cover"
-            />
+            <div className="relative aspect-video md:aspect-[4/3]">
+              <Image 
+                src={module.image} 
+                alt={module.title} 
+                fill
+                className="object-cover"
+              />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             
             {/* Floating Info Card */}

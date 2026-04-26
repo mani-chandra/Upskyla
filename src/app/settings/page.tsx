@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { User, Mail, Camera, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
@@ -61,7 +62,12 @@ export default function SettingsPage() {
               <div className="relative group">
                 <div className="h-32 w-32 rounded-full bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-4xl text-accent-primary font-black overflow-hidden shadow-xl transition-transform duration-500 group-hover:scale-105">
                   {formData.image ? (
-                    <img src={formData.image} alt="Profile" className="h-full w-full object-cover" />
+                    <Image 
+                      src={formData.image} 
+                      alt="Profile" 
+                      fill
+                      className="object-cover" 
+                    />
                   ) : (
                     formData.name?.[0]?.toUpperCase() || <User className="h-16 w-16" />
                   )}

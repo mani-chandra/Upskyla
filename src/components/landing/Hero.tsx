@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -48,11 +49,13 @@ export function Hero() {
           className="relative max-w-6xl mx-auto"
         >
           <div className="relative rounded-2xl overflow-hidden border border-gray-200 shadow-2xl bg-gray-50 p-2">
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <img 
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm relative aspect-[2426/1364]">
+              <Image 
                 src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop" 
                 alt="Upskyla Platform Dashboard" 
-                className="w-full h-auto object-cover"
+                fill
+                className="object-cover"
+                priority
               />
             </div>
           </div>

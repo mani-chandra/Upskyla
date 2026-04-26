@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Search, User, X, Menu, Settings, LogOut, UserCircle } from "lucide-react";
+import Image from "next/image";
 import { useDashboard } from "@/lib/context/DashboardContext";
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,9 +128,14 @@ export function Navbar() {
               <p className="text-sm font-medium text-white">{user?.name || "Student"}</p>
               <p className="text-xs text-slate-400 capitalize">{user?.role?.toLowerCase() || "Free Plan"}</p>
             </div>
-            <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary font-bold border border-slate-700 overflow-hidden">
+            <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary font-bold border border-slate-700 overflow-hidden relative">
               {user?.image ? (
-                <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                <Image 
+                  src={user.image} 
+                  alt={user.name || "User"} 
+                  fill
+                  className="object-cover" 
+                />
               ) : (
                 user?.name?.[0]?.toUpperCase() || <User className="h-6 w-6" />
               )}
