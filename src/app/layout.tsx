@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { DashboardProvider } from "@/lib/context/DashboardContext";
+import { ChatBot } from "@/components/layout/ChatBot";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <DashboardProvider>
           {children}
+          <ChatBot />
         </DashboardProvider>
         <Script
           id="razorpay-checkout-js"
