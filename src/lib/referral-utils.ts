@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
  * Processes a referral reward for a moderator when a student completes a milestone.
  * Milestones include: First rent payment, Course enrollment, or Admin manual approval.
  */
-export async function processReferralReward(tx: any, referredUserId: string) {
+export async function processReferralReward(tx: any, referredUserId: string, milestoneType: 'HOSTEL' | 'COURSE') {
   try {
     // 1. Find the referral record for this student
     const referral = await tx.referral.findUnique({
@@ -12,13 +12,16 @@ export async function processReferralReward(tx: any, referredUserId: string) {
     });
 
     // 2. If no referral exists or it's already rewarded, skip
-    if (!referral || referral.status === "REWARD_CREDITED" || referral.status === "ELIGIBLE_FOR_WITHDRAWAL") {
+    // Note: We might want to allow multiple rewards if they do both hostel AND course?
+    // Based on user request "750 for hostel and 2500 for course registration", 
+    // it sounds like they are distinct rewards.
+    if (!referral) {
       return null;
     }
 
     // 3. Credit the referrer's wallet
-    // Default reward amount is ₹750 as per existing admin logic
-    const rewardAmount = 750;
+    // Updated rewards: ₹750 for hostel, ₹2500 for courses
+    const rewardAmount = milestoneType === 'HOSTEL' ? 750 : 2500;
     
     // 4. Upsert wallet for the referrer
     await tx.wallet.upsert({

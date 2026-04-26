@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   Wallet,
+  Settings,
   X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ const sidebarItems = [
   { name: "Taxi & Rental", href: "/taxi", icon: Car, flag: "taxi", roles: ["STUDENT"] },
   { name: "Job Portal", href: "/jobs", icon: Briefcase, flag: "jobs", roles: ["STUDENT"] },
   { name: "Wallet", href: "/wallet", icon: Wallet, roles: ["STUDENT", "MODERATOR"] },
+  { name: "Settings", href: "/settings", icon: Settings, roles: ["STUDENT", "MODERATOR", "ADMIN"] },
 ];
 
 const itemVariants: Variants = {

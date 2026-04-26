@@ -66,7 +66,7 @@ export async function POST(req: Request) {
       });
 
       // Process referral reward if applicable
-      await processReferralReward(tx, session.user.id);
+      await processReferralReward(tx, session.user.id, 'HOSTEL');
 
       return { booking: updatedBooking };
     });

@@ -244,6 +244,7 @@ model User {
   email              String                @unique
   password           String
   name               String?
+  image              String?
   role               Role                  @default(STUDENT)
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
@@ -340,6 +341,7 @@ enum WalletTransactionStatus {
   PENDING
   APPROVED
   WITHDRAWN
+  CANCELLED
 }
 
 enum WalletTransactionType {

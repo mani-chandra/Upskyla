@@ -23,11 +23,21 @@ export async function GET() {
             email: true,
             createdAt: true,
             payments: {
-              where: { status: "COMPLETED" },
+              where: { status: "captured" }, // Razorpay successful payments are 'captured'
               select: {
                 amount: true,
                 type: true,
                 createdAt: true
+              }
+            },
+            walletTransactions: {
+              where: { 
+                type: "CREDIT",
+                status: "APPROVED"
+              },
+              select: {
+                amount: true,
+                referralId: true
               }
             },
             enrollments: {
@@ -48,7 +58,15 @@ export async function GET() {
 
     const formattedReferrals = referrals.map((ref: any) => {
       const user = ref.referredUser;
+      
+      // Calculate total amount paid by the referred student
       const totalPaid = user.payments.reduce((acc: number, p: any) => acc + p.amount, 0);
+      
+      // Calculate reward earned for this specific referral
+      // We look at the referred user's wallet transactions that match this referral ID
+      const rewardEarned = user.walletTransactions
+        .filter((wt: any) => wt.referralId === ref.id)
+        .reduce((acc: number, wt: any) => acc + wt.amount, 0);
       
       // Determine services
       const services = [];
@@ -64,6 +82,7 @@ export async function GET() {
         studentName: user.name || "Anonymous",
         studentEmail: user.email,
         totalPaid,
+        rewardEarned,
         services,
         joinedAt: user.createdAt,
         status: ref.status

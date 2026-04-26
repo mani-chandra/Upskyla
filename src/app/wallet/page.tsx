@@ -53,11 +53,25 @@ export default function WalletPage() {
       return;
     }
     setWithdrawing(true);
-    // Simulate withdrawal request
-    setTimeout(() => {
-      alert("Withdrawal request submitted! Admin will approve it shortly.");
+    try {
+      const res = await fetch("/api/wallet/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: status.wallet.balance }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Withdrawal request submitted! Admin will approve it shortly.");
+        fetchStatus(); // Refresh balance
+      } else {
+        alert(data.message || "Failed to submit withdrawal request");
+      }
+    } catch (error) {
+      console.error("Withdrawal error:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
       setWithdrawing(false);
-    }, 1500);
+    }
   };
 
   if (loading) {

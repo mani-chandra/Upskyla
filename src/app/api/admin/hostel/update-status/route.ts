@@ -43,10 +43,10 @@ export async function POST(req: Request) {
       });
 
       // 2. Check if conditions are met to trigger referral reward
-      // The user wants it to trigger as soon as first rent is paid
-      if (booking.firstRentPaid) {
-        await processReferralReward(tx, booking.userId);
-      }
+       // The user wants it to trigger as soon as first rent is paid
+       if (booking.firstRentPaid) {
+         await processReferralReward(tx, booking.userId, 'HOSTEL');
+       }
 
       return booking;
     });

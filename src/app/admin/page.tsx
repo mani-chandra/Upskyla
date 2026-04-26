@@ -5,11 +5,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { motion } from "framer-motion";
 import { 
   Users, 
-  Settings, 
-  CreditCard, 
   Flag, 
-  Calendar,
-  MessageSquare,
   BookOpen,
   Plus,
   Loader2,
@@ -55,14 +51,21 @@ export default function AdminDashboardPage() {
   const fetchData = async () => {
     setDataLoading(true);
     try {
-      const [flagsData, referralsData, withdrawalsData, usersData, hostelData, coursesData] = await Promise.all([
-        fetch("/api/feature-flags").then(res => res.json()),
-        fetch("/api/admin/referrals").then(res => res.json()),
-        fetch("/api/admin/withdrawals").then(res => res.json()),
-        fetch("/api/admin/users").then(res => res.json()),
-        fetch("/api/admin/hostel/bookings").then(res => res.json()),
-        fetch("/api/courses").then(res => res.json())
+      const [flagsRes, referralsRes, withdrawalsRes, usersRes, hostelRes, coursesRes] = await Promise.all([
+        fetch("/api/feature-flags"),
+        fetch("/api/admin/referrals"),
+        fetch("/api/admin/withdrawals"),
+        fetch("/api/admin/users"),
+        fetch("/api/admin/hostel/bookings"),
+        fetch("/api/courses")
       ]);
+
+      const flagsData = flagsRes.ok ? await flagsRes.json() : [];
+      const referralsData = referralsRes.ok ? await referralsRes.json() : { referrals: [] };
+      const withdrawalsData = withdrawalsRes.ok ? await withdrawalsRes.json() : [];
+      const usersData = usersRes.ok ? await usersRes.json() : [];
+      const hostelData = hostelRes.ok ? await hostelRes.json() : [];
+      const coursesData = coursesRes.ok ? await coursesRes.json() : [];
 
       setFlags(Array.isArray(flagsData) ? flagsData : []);
       setReferrals(referralsData?.referrals || []);
@@ -456,6 +459,48 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+          {/* Withdrawal Requests */}
+          <AdminCard title="Withdrawals" icon={DollarSign} badge={`${withdrawals.length} Pending`} className="xl:col-span-2">
+            <div className="divide-y divide-slate-100">
+              {withdrawals.length === 0 ? (
+                <div className="py-12 text-center">
+                  <div className="bg-slate-50 p-4 rounded-2xl inline-block mb-4">
+                    <TrendingUp className="h-8 w-8 text-slate-200" />
+                  </div>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No pending requests</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {withdrawals.map((w) => (
+                    <div key={w.id} className="p-6 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:border-accent-primary/30 transition-all">
+                      <div>
+                        <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors">{w.user.name || w.user.email}</p>
+                        <p className="text-lg font-black text-emerald-600 tracking-tight">{formatCurrency(w.amount)}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Requested on {new Date(w.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleWithdrawal(w.id, "WITHDRAWN")} 
+                          className="p-3 bg-white text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-200 hover:border-emerald-100 shadow-sm active:scale-90"
+                          title="Approve Withdrawal"
+                        >
+                          <CheckCircle2 className="h-5 w-5" />
+                        </button>
+                        <button 
+                          onClick={() => handleWithdrawal(w.id, "CANCELLED")} 
+                          className="p-3 bg-white text-red-600 hover:bg-red-50 rounded-xl transition-all border border-slate-200 hover:border-red-100 shadow-sm active:scale-90"
+                          title="Cancel & Refund"
+                        >
+                          <XCircle className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </AdminCard>
+
           {/* User Management */}
           <AdminCard title="User Access" icon={UserCheck} badge={`${users.length} Users`}>
             <div className="overflow-x-auto">
@@ -735,44 +780,16 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-          {/* Withdrawal Requests */}
-          <AdminCard title="Withdrawals" icon={DollarSign} badge={`${withdrawals.length} Pending`}>
-            <div className="divide-y divide-slate-100">
-              {withdrawals.length === 0 ? (
-                <div className="py-12 text-center">
-                  <div className="bg-slate-50 p-4 rounded-2xl inline-block mb-4">
-                    <TrendingUp className="h-8 w-8 text-slate-200" />
-                  </div>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No pending requests</p>
-                </div>
-              ) : (
-                withdrawals.map((w) => (
-                  <div key={w.id} className="py-5 flex items-center justify-between group">
-                    <div>
-                      <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors">{w.user.name || w.user.email}</p>
-                      <p className="text-lg font-black text-emerald-600 tracking-tight">{formatCurrency(w.amount)}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleWithdrawal(w.id, "WITHDRAWN")} className="p-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-100 shadow-sm active:scale-90">
-                        <CheckCircle2 className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => handleWithdrawal(w.id, "CANCELLED")} className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100 shadow-sm active:scale-90">
-                        <XCircle className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </AdminCard>
-
           {/* Recent Referrals */}
-          <AdminCard title="Recent Referrals" icon={Gift}>
-            <div className="divide-y divide-slate-100">
+          <AdminCard title="Recent Referrals" icon={Gift} className="xl:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {referrals.slice(0, 6).map((ref) => (
-                <div key={ref.id} className="py-5 group">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors tracking-tight">{ref.referrer.name || ref.referrer.email}</p>
+                <div key={ref.id} className="p-6 rounded-3xl bg-slate-50 border border-slate-100 group hover:border-accent-primary/30 transition-all">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-sm font-black text-slate-900 group-hover:text-accent-primary transition-colors tracking-tight">{ref.referrer.name || ref.referrer.email}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Moderator</p>
+                    </div>
                     <span className={cn(
                       "text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest shadow-sm border",
                       ref.status === "REWARD_CREDITED" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-amber-50 text-amber-700 border-amber-100"
@@ -780,7 +797,10 @@ export default function AdminDashboardPage() {
                       {ref.status.split("_")[0]}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Referred: {ref.referredUser.name || ref.referredUser.email}</p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Referred Student</p>
+                    <p className="text-xs font-bold text-slate-700">{ref.referredUser.name || ref.referredUser.email}</p>
+                  </div>
                 </div>
               ))}
             </div>

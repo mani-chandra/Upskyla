@@ -1,14 +1,38 @@
 "use client";
 
-import { Bell, Search, User, X, Menu } from "lucide-react";
+import { Bell, Search, User, X, Menu, Settings, LogOut, UserCircle } from "lucide-react";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const { user, moduleTheme, setIsSidebarOpen } = useDashboard();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/announcements")
@@ -94,14 +118,67 @@ export function Navbar() {
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center space-x-3 border-l pl-4 border-slate-800">
-          <div className="text-right hidden lg:block">
-            <p className="text-sm font-medium text-white">{user?.name || "Student"}</p>
-            <p className="text-xs text-slate-400 capitalize">{user?.role?.toLowerCase() || "Free Plan"}</p>
-          </div>
-          <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary font-bold border border-slate-700 transition-colors duration-300">
-            {user?.name?.[0]?.toUpperCase() || <User className="h-6 w-6" />}
-          </div>
+        <div className="flex items-center space-x-3 border-l pl-4 border-slate-800 relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="text-right hidden lg:block">
+              <p className="text-sm font-medium text-white">{user?.name || "Student"}</p>
+              <p className="text-xs text-slate-400 capitalize">{user?.role?.toLowerCase() || "Free Plan"}</p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary font-bold border border-slate-700 overflow-hidden">
+              {user?.image ? (
+                <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+              ) : (
+                user?.name?.[0]?.toUpperCase() || <User className="h-6 w-6" />
+              )}
+            </div>
+          </button>
+
+          <AnimatePresence>
+            {showProfileDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden py-2"
+              >
+                <div className="px-4 py-3 border-b border-slate-800 lg:hidden">
+                  <p className="text-sm font-black text-white">{user?.name || "Student"}</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{user?.role || "STUDENT"}</p>
+                </div>
+                
+                <Link 
+                  href="/settings" 
+                  onClick={() => setShowProfileDropdown(false)}
+                  className="flex items-center space-x-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800/50 hover:text-white transition-all group"
+                >
+                  <Settings className="h-4 w-4 text-slate-500 group-hover:text-accent-primary transition-colors" />
+                  <span className="font-bold uppercase tracking-wider text-[11px]">Account Settings</span>
+                </Link>
+
+                <Link 
+                  href="/dashboard" 
+                  onClick={() => setShowProfileDropdown(false)}
+                  className="flex items-center space-x-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800/50 hover:text-white transition-all group"
+                >
+                  <UserCircle className="h-4 w-4 text-slate-500 group-hover:text-accent-primary transition-colors" />
+                  <span className="font-bold uppercase tracking-wider text-[11px]">My Dashboard</span>
+                </Link>
+
+                <div className="border-t border-slate-800 mt-2 pt-2">
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 transition-all group w-full text-left"
+                  >
+                    <LogOut className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-[11px]">Sign Out</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

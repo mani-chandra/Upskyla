@@ -13,7 +13,8 @@ import {
   Search,
   Filter,
   ArrowUpRight,
-  IndianRupee
+  IndianRupee,
+  Loader2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ interface Stats {
   courseEnrollments: number;
   hostelBookings: number;
   referralCode: string;
+  walletBalance: number;
 }
 
 interface Referral {
@@ -31,6 +33,7 @@ interface Referral {
   studentName: string;
   studentEmail: string;
   totalPaid: number;
+  rewardEarned: number;
   services: string[];
   joinedAt: string;
   status: string;
@@ -40,31 +43,59 @@ export default function ModeratorDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
+  const [withdrawing, setWithdrawing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsRes, referralsRes] = await Promise.all([
-          fetch("/api/moderator/stats"),
-          fetch("/api/moderator/referrals")
-        ]);
-        
-        const statsData = await statsRes.json();
-        const referralsData = await referralsRes.json();
-        
-        setStats(statsData);
-        setReferrals(referralsData);
-      } catch (error) {
-        console.error("Error fetching moderator data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const [statsRes, referralsRes] = await Promise.all([
+        fetch("/api/moderator/stats"),
+        fetch("/api/moderator/referrals")
+      ]);
+      
+      const statsData = await statsRes.json();
+      const referralsData = await referralsRes.json();
+      
+      setStats(statsData);
+      setReferrals(referralsData);
+    } catch (error) {
+      console.error("Error fetching moderator data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
+
+  const handleWithdraw = async () => {
+    if ((stats?.walletBalance || 0) < 750) {
+      alert("Minimum withdrawal amount is ₹750");
+      return;
+    }
+    setWithdrawing(true);
+    try {
+      const res = await fetch("/api/wallet/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: stats?.walletBalance }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Withdrawal request submitted! Admin will approve it shortly.");
+        fetchData(); // Refresh stats/balance
+      } else {
+        alert(data.message || "Failed to submit withdrawal request");
+      }
+    } catch (error) {
+      console.error("Withdrawal error:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setWithdrawing(false);
+    }
+  };
 
   const copyReferralCode = () => {
     if (stats?.referralCode) {
@@ -138,7 +169,7 @@ export default function ModeratorDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {[
             { label: "Total Referred", value: stats?.totalReferred, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
             { label: "Total Revenue", value: formatCurrency(stats?.totalRevenue || 0), icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -159,6 +190,35 @@ export default function ModeratorDashboard() {
               <h3 className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</h3>
             </motion.div>
           ))}
+
+          {/* Wallet Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl shadow-slate-900/20 group hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-white flex flex-col justify-between"
+          >
+            <div>
+              <div className="p-4 rounded-2xl w-fit mb-6 bg-white/10 text-white group-hover:scale-110 transition-transform">
+                <IndianRupee className="w-6 h-6" />
+              </div>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2">Available Balance</p>
+              <h3 className="text-3xl font-black text-white tracking-tight">{formatCurrency(stats?.walletBalance || 0)}</h3>
+            </div>
+            
+            <button
+              onClick={handleWithdraw}
+              disabled={(stats?.walletBalance || 0) < 750 || withdrawing}
+              className="mt-6 w-full py-3 bg-primary-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group/btn"
+            >
+              {withdrawing ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                <>
+                  Withdraw
+                  <ArrowUpRight className="w-4 h-4 transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                </>
+              )}
+            </button>
+          </motion.div>
         </div>
 
         {/* Student List */}
@@ -190,7 +250,8 @@ export default function ModeratorDashboard() {
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Student</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Joined Date</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Services Opted</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Paid</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amount Paid</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Reward Earned</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
                 </tr>
               </thead>
@@ -222,6 +283,9 @@ export default function ModeratorDashboard() {
                       </td>
                       <td className="px-8 py-6">
                         <div className="font-black text-slate-900">{formatCurrency(ref.totalPaid)}</div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg w-fit">+{formatCurrency(ref.rewardEarned)}</div>
                       </td>
                       <td className="px-8 py-6">
                         <span className={cn(

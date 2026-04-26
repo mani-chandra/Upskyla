@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     });
 
     // Process referral reward if applicable
-    await processReferralReward(prisma, session.user.id);
+     await processReferralReward(prisma, session.user.id, 'HOSTEL');
 
     return NextResponse.json({
       message: "Check-in successful",

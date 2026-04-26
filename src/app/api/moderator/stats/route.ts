@@ -13,10 +13,15 @@ export async function GET() {
 
     const moderatorId = session.user.id;
 
-    // Fetch the moderator from DB to get their actual referral code
+    // Fetch the moderator from DB to get their actual referral code and wallet
     const moderator = await prisma.user.findUnique({
       where: { id: moderatorId },
-      select: { referralCode: true }
+      select: { 
+        referralCode: true,
+        wallet: {
+          select: { balance: true }
+        }
+      }
     });
 
     // Get all referrals made by this moderator
@@ -26,7 +31,7 @@ export async function GET() {
         referredUser: {
           include: {
             payments: {
-              where: { status: "COMPLETED" }
+              where: { status: "captured" } // Razorpay successful payments are 'captured'
             },
             enrollments: true,
             hostelBooking: true,
@@ -54,7 +59,8 @@ export async function GET() {
       totalRevenue,
       courseEnrollments,
       hostelBookings,
-      referralCode: moderator?.referralCode || "NOT_FOUND"
+      referralCode: moderator?.referralCode || "NOT_FOUND",
+      walletBalance: moderator?.wallet?.balance || 0
     };
 
     return NextResponse.json(stats);
