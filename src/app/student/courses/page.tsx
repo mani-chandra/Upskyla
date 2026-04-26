@@ -176,7 +176,7 @@ export default function StudentCourses() {
               <div>
                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">No courses found</h2>
                 <p className="text-slate-500 font-medium mt-2 leading-relaxed">
-                  You haven't enrolled in any courses yet. Explore our curriculum to start your learning journey.
+                  You haven&apos;t enrolled in any courses yet. Explore our curriculum to start your learning journey.
                 </p>
               </div>
               <Link 
