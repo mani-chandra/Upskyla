@@ -22,7 +22,8 @@ import {
   Upload,
   Link as LinkIcon,
   AlertCircle,
-  Download
+  Download,
+  Lock
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { courses as initialCourses } from "@/lib/courses-data";
