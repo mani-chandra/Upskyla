@@ -21,7 +21,8 @@ import {
   FileText,
   Upload,
   Link as LinkIcon,
-  AlertCircle
+  AlertCircle,
+  Download
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { courses as initialCourses } from "@/lib/courses-data";
@@ -138,6 +139,50 @@ export default function AdminDashboardPage() {
       }
     } catch (error) {
       console.error("Error updating user role:", error);
+    }
+  };
+
+  const changeUserPassword = async (userId: string) => {
+    const newPassword = prompt("Enter new password for user:");
+    if (!newPassword) return;
+
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, action: "changePassword", newPassword }),
+      });
+      if (res.ok) {
+        alert("Password updated successfully!");
+      } else {
+        alert("Failed to update password");
+      }
+    } catch (error) {
+      console.error("Error changing user password:", error);
+      alert("Failed to update password");
+    }
+  };
+
+  const deleteUserAccount = async (userId: string, userName: string) => {
+    if (!confirm(`Are you sure you want to delete ${userName || "this user"}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      if (res.ok) {
+        setUsers(prev => prev.filter(u => u.id !== userId));
+        alert("User deleted successfully!");
+      } else {
+        alert("Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete user");
     }
   };
 
@@ -274,6 +319,26 @@ export default function AdminDashboardPage() {
     } catch (error) {
       console.error("Error updating syllabus URL:", error);
       alert("An error occurred during update");
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await fetch("/api/admin/export");
+      if (!res.ok) throw new Error("Failed to export data");
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `upskyla-export-${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Failed to export data");
     }
   };
 
@@ -441,13 +506,22 @@ export default function AdminDashboardPage() {
             </h1>
             <p className="text-slate-500 font-medium mt-1 text-sm sm:text-base">System-wide configuration and user management.</p>
           </div>
-          <button 
-            onClick={() => setShowAnnouncementModal(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
-          >
-            <Plus className="h-4 w-4" />
-            New Announcement
-          </button>
+          <div className="flex gap-3">
+            <button 
+              onClick={handleExport}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200"
+            >
+              <Download className="h-4 w-4" />
+              Export Data
+            </button>
+            <button 
+              onClick={() => setShowAnnouncementModal(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+            >
+              <Plus className="h-4 w-4" />
+              New Announcement
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -535,16 +609,32 @@ export default function AdminDashboardPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <select 
-                          value={user.role}
-                          onChange={(e) => updateUserRole(user.id, e.target.value)}
-                          className="text-xs font-black bg-white border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-all cursor-pointer"
-                        >
-                          <option value="STUDENT">Student</option>
-                          <option value="MODERATOR">Moderator</option>
-                          <option value="STAFF">Staff</option>
-                          <option value="ADMIN">Admin</option>
-                        </select>
+                        <div className="flex items-center justify-end gap-2">
+                          <select 
+                            value={user.role}
+                            onChange={(e) => updateUserRole(user.id, e.target.value)}
+                            className="text-xs font-black bg-white border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-all cursor-pointer"
+                          >
+                            <option value="STUDENT">Student</option>
+                            <option value="MODERATOR">Moderator</option>
+                            <option value="STAFF">Staff</option>
+                            <option value="ADMIN">Admin</option>
+                          </select>
+                          <button
+                            onClick={() => changeUserPassword(user.id)}
+                            className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl transition-all border border-blue-100"
+                            title="Change Password"
+                          >
+                            <Lock className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteUserAccount(user.id, user.name)}
+                            className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all border border-red-100"
+                            title="Delete Account"
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useDashboard } from "@/lib/context/DashboardContext";
-import { User, Mail, Camera, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, Mail, Camera, Save, Loader2, CheckCircle2, AlertCircle, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function SettingsPage() {
@@ -12,11 +12,20 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
     image: user?.image || "",
+  });
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,6 +54,48 @@ export default function SettingsPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordLoading(true);
+    setPasswordSuccess(false);
+    setPasswordError(null);
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("New passwords do not match");
+      setPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/user/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to change password");
+      }
+
+      setPasswordSuccess(true);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setTimeout(() => setPasswordSuccess(false), 3000);
+    } catch (err: any) {
+      setPasswordError(err.message);
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -172,6 +223,106 @@ export default function SettingsPage() {
                   <Save className="h-5 w-5" />
                 )}
                 {loading ? "Saving Changes..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="mt-8 bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden backdrop-blur-sm shadow-2xl">
+          <div className="p-8 border-b border-slate-800">
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
+              <Lock className="h-5 w-5 text-accent-primary" />
+              Change Password
+            </h2>
+          </div>
+
+          <form onSubmit={handlePasswordChange} className="p-8 space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Current Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-accent-primary transition-colors" />
+                </div>
+                <input
+                  type="password"
+                  value={passwordForm.currentPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                  className="block w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:border-accent-primary transition-all font-medium"
+                  placeholder="Enter current password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">New Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-accent-primary transition-colors" />
+                </div>
+                <input
+                  type="password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  className="block w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:border-accent-primary transition-all font-medium"
+                  placeholder="Enter new password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Confirm New Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-accent-primary transition-colors" />
+                </div>
+                <input
+                  type="password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  className="block w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:border-accent-primary transition-all font-medium"
+                  placeholder="Confirm new password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+              <div className="flex-1">
+                {passwordSuccess && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 text-emerald-400 font-bold text-sm"
+                  >
+                    <CheckCircle2 className="h-5 w-5" />
+                    Password changed successfully!
+                  </motion.div>
+                )}
+                {passwordError && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 text-rose-400 font-bold text-sm"
+                  >
+                    <AlertCircle className="h-5 w-5" />
+                    {passwordError}
+                  </motion.div>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-slate-900/20 transition-all active:scale-95"
+              >
+                {passwordLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Lock className="h-5 w-5" />
+                )}
+                {passwordLoading ? "Changing..." : "Change Password"}
               </button>
             </div>
           </form>

@@ -9,7 +9,7 @@ function generateCode(length = 8) {
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name, referralCode: usedReferralCode } = await req.json();
+    const { email, password, name, referralCode: usedReferralCode, role } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -74,6 +74,7 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         name,
+        role: role === "MODERATOR" ? "MODERATOR" : "STUDENT",
         referralCode: newReferralCode,
         referredByCode: referrer ? usedReferralCode.trim() : null,
         profile: {

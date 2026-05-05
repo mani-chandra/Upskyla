@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import bcrypt from "bcryptjs";
 
 export async function GET() {
   const session = await getSession();
@@ -30,7 +31,21 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId, role } = await req.json();
+    const { userId, role, action, newPassword } = await req.json();
+
+    if (action === "changePassword") {
+      if (!newPassword) {
+        return NextResponse.json({ message: "New password is required" }, { status: 400 });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword },
+      });
+
+      return NextResponse.json({ message: "Password updated successfully" });
+    }
 
     if (!["STUDENT", "ADMIN", "STAFF", "MODERATOR"].includes(role)) {
       return NextResponse.json({ message: "Invalid role" }, { status: 400 });
@@ -51,7 +66,34 @@ export async function PATCH(req: Request) {
   } catch (error) {
     console.error("Admin user update error:", error);
     return NextResponse.json(
-      { message: "An error occurred updating user role" },
+      { message: "An error occurred updating user" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { userId } = await req.json();
+
+    if (!userId) {
+      return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return NextResponse.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Admin user delete error:", error);
+    return NextResponse.json(
+      { message: "An error occurred deleting user" },
       { status: 500 }
     );
   }

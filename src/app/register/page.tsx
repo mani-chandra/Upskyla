@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [role, setRole] = useState("STUDENT");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, referralCode }),
+        body: JSON.stringify({ name, email, password, referralCode, role }),
       });
 
       const data = await res.json();
@@ -210,6 +211,38 @@ export default function RegisterPage() {
                     className="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 placeholder-gray-400"
                     placeholder="••••••••"
                   />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">
+                  Account Type
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRole("STUDENT")}
+                    className={`p-3.5 rounded-2xl border-2 transition-all text-left ${
+                      role === "STUDENT" 
+                        ? "border-primary-500 bg-primary-50 text-primary-700" 
+                        : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-semibold">Student</div>
+                    <div className="text-xs opacity-70">Access all student features</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole("MODERATOR")}
+                    className={`p-3.5 rounded-2xl border-2 transition-all text-left ${
+                      role === "MODERATOR" 
+                        ? "border-primary-500 bg-primary-50 text-primary-700" 
+                        : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="font-semibold">Moderator</div>
+                    <div className="text-xs opacity-70">Earn via referrals</div>
+                  </button>
                 </div>
               </div>
 
