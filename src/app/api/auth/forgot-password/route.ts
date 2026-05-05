@@ -40,16 +40,53 @@ export async function POST(req: Request) {
     // Generate reset URL
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
 
-    // For now, log the reset URL (in production, you should integrate an email service)
-    console.log("------------------------------------------");
-    console.log(`PASSWORD RESET REQUEST FOR: ${email}`);
-    console.log(`RESET URL: ${resetUrl}`);
-    console.log("------------------------------------------");
+    // Send email using Brevo if API key is available
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const { BrevoClient } = await import("@getbrevo/brevo");
+        const client = new BrevoClient({
+          apiKey: process.env.BREVO_API_KEY,
+        });
+
+        const response = await client.transactionalEmails.sendTransacEmail({
+          sender: { 
+            name: "Upskyla", 
+            email: "manichandrararao@gmail.com" 
+          },
+          to: [{ email: email, name: user.name || "User" }],
+          subject: "Password Reset Request",
+          htmlContent: `
+            <html>
+              <body>
+                <h1>Password Reset Request</h1>
+                <p>Hello ${user.name || "User"},</p>
+                <p>You requested a password reset for your Upskyla account.</p>
+                <p>Click the link below to reset your password:</p>
+                <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 8px;">Reset Password</a>
+                <p>This link will expire in 1 hour.</p>
+                <p>If you didn't request this, you can safely ignore this email.</p>
+                <p>Best regards,<br>Upskyla Team</p>
+              </body>
+            </html>
+          `,
+        });
+
+        console.log("Reset email sent successfully to:", email);
+      } catch (emailError) {
+        console.error("Error sending reset email:", emailError);
+      }
+    } else {
+      // Fallback for development without Brevo
+      console.log("------------------------------------------");
+      console.log(`PASSWORD RESET REQUEST FOR: ${email}`);
+      console.log(`RESET URL: ${resetUrl}`);
+      console.log("------------------------------------------");
+    }
 
     return NextResponse.json(
       { 
         message: "Reset link sent! Please check your email.",
-        ...(process.env.NODE_ENV === "development" ? { debugUrl: resetUrl } : {})
+        ...(process.env.NODE_ENV === "development" && !process.env.BREVO_API_KEY ? { debugUrl: resetUrl } : {})
       },
       { status: 200 }
     );
