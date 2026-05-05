@@ -85,9 +85,25 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ message: "User ID is required" }, { status: 400 });
     }
 
-    await prisma.user.delete({
-      where: { id: userId },
-    });
+    await prisma.$transaction([
+      prisma.complaintTicket.deleteMany({ where: { userId } }),
+      prisma.consultationBooking.deleteMany({ where: { userId } }),
+      prisma.coupon.deleteMany({ where: { userId } }),
+      prisma.enrollment.deleteMany({ where: { userId } }),
+      prisma.examAttempt.deleteMany({ where: { userId } }),
+      prisma.gamingBooking.deleteMany({ where: { userId } }),
+      prisma.jobApplication.deleteMany({ where: { userId } }),
+      prisma.notification.deleteMany({ where: { userId } }),
+      prisma.payment.deleteMany({ where: { userId } }),
+      prisma.profile.deleteMany({ where: { userId } }),
+      prisma.referral.deleteMany({ where: { OR: [{ referrerId: userId }, { referredUserId: userId }] } }),
+      prisma.taxiBooking.deleteMany({ where: { userId } }),
+      prisma.theatreBooking.deleteMany({ where: { userId } }),
+      prisma.walletTransaction.deleteMany({ where: { userId } }),
+      prisma.wallet.deleteMany({ where: { userId } }),
+      prisma.hostelBooking.deleteMany({ where: { userId } }),
+      prisma.user.delete({ where: { id: userId } }),
+    ]);
 
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
